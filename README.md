@@ -44,8 +44,7 @@
 
 ## 分享与安装
 
-- 同事只需要阅读：直接分享飞书资料库，或让其浏览 [`examples/`](examples/README.md)。
-- 同事需要独立运行：按 [`docs/installation.md`](docs/installation.md) 安装两个 Skill。
+- 需要独立运行：按 [`docs/installation.md`](docs/installation.md) 安装两个 Skill。
 - ASR 与飞书并非 Skill 自动附带的能力，详细边界和接入契约见 [`docs/asr-and-integrations.md`](docs/asr-and-integrations.md)。
 
 安装前可以运行只读环境检查：
@@ -54,7 +53,7 @@
 python3 scripts/check_environment.py
 ```
 
-安装到同事实际的用户 Skill 目录：
+安装到实际的用户 Skill 目录：
 
 ```bash
 export USER_SKILLS_DIR="/实际路径/workspace/.user_skills"
