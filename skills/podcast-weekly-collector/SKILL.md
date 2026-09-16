@@ -51,6 +51,8 @@ python3 <skill-dir>/scripts/fetch_week.py \
 
 ## ASR 输出契约
 
+ASR 是运行环境提供的音频转写工具、模型或 API，不随 Skill 自动安装。普通 Agent 是否具备该能力取决于平台工具、账号权限和额度；“能接收音频”不等于能够稳定返回时间戳、置信度或说话人分区。首次使用前完整读取 [`references/asr-contract.md`](references/asr-contract.md) 并用短音频实测。
+
 外部 ASR 结果规范化为：
 
 ```json

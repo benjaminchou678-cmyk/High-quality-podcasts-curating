@@ -42,6 +42,33 @@
 - `examples/sources.json`
 - `skills/podcast-weekly-collector/assets/default-sources.json`
 
+## 分享与安装
+
+- 同事只需要阅读：直接分享飞书资料库，或让其浏览 [`examples/`](examples/README.md)。
+- 同事需要独立运行：按 [`docs/installation.md`](docs/installation.md) 安装两个 Skill。
+- ASR 与飞书并非 Skill 自动附带的能力，详细边界和接入契约见 [`docs/asr-and-integrations.md`](docs/asr-and-integrations.md)。
+
+安装前可以运行只读环境检查：
+
+```bash
+python3 scripts/check_environment.py
+```
+
+安装到同事实际的用户 Skill 目录：
+
+```bash
+export USER_SKILLS_DIR="/实际路径/workspace/.user_skills"
+python3 scripts/install_skills.py --target "$USER_SKILLS_DIR"
+```
+
+安装脚本默认不覆盖同名 Skill。升级时先预演：
+
+```bash
+python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --dry-run --overwrite
+```
+
+确认后再执行 `--overwrite`；旧版本会自动备份到目标目录下的 `.skill-backups/`。
+
 ## 输出载体选择
 
 逐字稿清洗 Skill 支持两个输出接口：
@@ -69,21 +96,27 @@
 │           ├── clean_transcript.py
 │           ├── render_html_reader.py
 │           └── render_weekly_trace.py
-├── examples/
-│   ├── README.md
-│   ├── sources.json
-│   └── 2026-09-07至2026-09-13_真实周报与逐字稿/
-│       ├── manifest.json
-│       ├── weekly-report.md
-│       ├── weekly-report.html
-│       └── episodes/
-│           └── YYYY-MM-DD_节目名_简短标题/
-│               ├── metadata.json
-│               └── transcript/
-│                   ├── transcript.readable.md
-│                   ├── dialogue.readable.json
-│                   └── quality-report.json
-└── docs/architecture.md
+├── docs/
+│   ├── architecture.md
+│   ├── installation.md
+│   └── asr-and-integrations.md
+├── scripts/
+│   ├── check_environment.py
+│   └── install_skills.py
+└── examples/
+    ├── README.md
+    ├── sources.json
+    └── 2026-09-07至2026-09-13_真实周报与逐字稿/
+        ├── manifest.json
+        ├── weekly-report.md
+        ├── weekly-report.html
+        └── episodes/
+            └── YYYY-MM-DD_节目名_简短标题/
+                ├── metadata.json
+                └── transcript/
+                    ├── transcript.readable.md
+                    ├── dialogue.readable.json
+                    └── quality-report.json
 ```
 
 ## 查看真实演示
