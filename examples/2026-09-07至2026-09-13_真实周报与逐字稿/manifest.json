@@ -116,9 +116,10 @@
       "duration": "01:27:15",
       "rss_transcript_candidates": [],
       "transcript_status": "asr_transcript_generated",
-      "transcript_markdown": "episodes/e648ef332c84ccc7/transcript/transcript.readable.md",
-      "dialogue_path": "episodes/e648ef332c84ccc7/transcript/dialogue.readable.json",
-      "quality_report": "episodes/e648ef332c84ccc7/transcript/quality-report.json"
+      "transcript_markdown": "episodes/2026-09-07_高能量_全球流动性与金融结构转型/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/2026-09-07_高能量_全球流动性与金融结构转型/transcript/dialogue.readable.json",
+      "quality_report": "episodes/2026-09-07_高能量_全球流动性与金融结构转型/transcript/quality-report.json",
+      "folder_name": "2026-09-07_高能量_全球流动性与金融结构转型"
     },
     {
       "episode_id": "6cb63ae82ea29fdc",
@@ -130,9 +131,10 @@
       "duration": "01:16:47",
       "rss_transcript_candidates": [],
       "transcript_status": "asr_transcript_generated",
-      "transcript_markdown": "episodes/6cb63ae82ea29fdc/transcript/transcript.readable.md",
-      "dialogue_path": "episodes/6cb63ae82ea29fdc/transcript/dialogue.readable.json",
-      "quality_report": "episodes/6cb63ae82ea29fdc/transcript/quality-report.json"
+      "transcript_markdown": "episodes/2026-09-07_十字路口Crossing_对谈陈安妮/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/2026-09-07_十字路口Crossing_对谈陈安妮/transcript/dialogue.readable.json",
+      "quality_report": "episodes/2026-09-07_十字路口Crossing_对谈陈安妮/transcript/quality-report.json",
+      "folder_name": "2026-09-07_十字路口Crossing_对谈陈安妮"
     },
     {
       "episode_id": "cee14faa9638bb9f",
@@ -144,9 +146,10 @@
       "duration": "02:06:14",
       "rss_transcript_candidates": [],
       "transcript_status": "asr_transcript_generated",
-      "transcript_markdown": "episodes/cee14faa9638bb9f/transcript/transcript.readable.md",
-      "dialogue_path": "episodes/cee14faa9638bb9f/transcript/dialogue.readable.json",
-      "quality_report": "episodes/cee14faa9638bb9f/transcript/quality-report.json"
+      "transcript_markdown": "episodes/2026-09-12_卫诗婕漫谈_蓝色光标与AhaCreator访谈/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/2026-09-12_卫诗婕漫谈_蓝色光标与AhaCreator访谈/transcript/dialogue.readable.json",
+      "quality_report": "episodes/2026-09-12_卫诗婕漫谈_蓝色光标与AhaCreator访谈/transcript/quality-report.json",
+      "folder_name": "2026-09-12_卫诗婕漫谈_蓝色光标与AhaCreator访谈"
     },
     {
       "episode_id": "dad0c49ec1bbccea",
@@ -158,9 +161,10 @@
       "duration": "01:25:05",
       "rss_transcript_candidates": [],
       "transcript_status": "asr_transcript_generated",
-      "transcript_markdown": "episodes/dad0c49ec1bbccea/transcript/transcript.readable.md",
-      "dialogue_path": "episodes/dad0c49ec1bbccea/transcript/dialogue.readable.json",
-      "quality_report": "episodes/dad0c49ec1bbccea/transcript/quality-report.json"
+      "transcript_markdown": "episodes/2026-09-07_卫诗婕漫谈_AI人才与组织变革/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/2026-09-07_卫诗婕漫谈_AI人才与组织变革/transcript/dialogue.readable.json",
+      "quality_report": "episodes/2026-09-07_卫诗婕漫谈_AI人才与组织变革/transcript/quality-report.json",
+      "folder_name": "2026-09-07_卫诗婕漫谈_AI人才与组织变革"
     },
     {
       "episode_id": "4aa1faf14940e0db",
@@ -172,9 +176,10 @@
       "duration": "00:10:31",
       "rss_transcript_candidates": [],
       "transcript_status": "asr_transcript_generated",
-      "transcript_markdown": "episodes/4aa1faf14940e0db/transcript/transcript.readable.md",
-      "dialogue_path": "episodes/4aa1faf14940e0db/transcript/dialogue.readable.json",
-      "quality_report": "episodes/4aa1faf14940e0db/transcript/quality-report.json"
+      "transcript_markdown": "episodes/2026-09-10_小Lin说_特朗普关税进展/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/2026-09-10_小Lin说_特朗普关税进展/transcript/dialogue.readable.json",
+      "quality_report": "episodes/2026-09-10_小Lin说_特朗普关税进展/transcript/quality-report.json",
+      "folder_name": "2026-09-10_小Lin说_特朗普关税进展"
     },
     {
       "episode_id": "4bfe6adf6e9d5f9c",
@@ -186,9 +191,10 @@
       "duration": "01:49:29",
       "rss_transcript_candidates": [],
       "transcript_status": "asr_transcript_generated",
-      "transcript_markdown": "episodes/4bfe6adf6e9d5f9c/transcript/transcript.readable.md",
-      "dialogue_path": "episodes/4bfe6adf6e9d5f9c/transcript/dialogue.readable.json",
-      "quality_report": "episodes/4bfe6adf6e9d5f9c/transcript/quality-report.json"
+      "transcript_markdown": "episodes/2026-09-11_知行小酒馆_价值投资与巴菲特/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/2026-09-11_知行小酒馆_价值投资与巴菲特/transcript/dialogue.readable.json",
+      "quality_report": "episodes/2026-09-11_知行小酒馆_价值投资与巴菲特/transcript/quality-report.json",
+      "folder_name": "2026-09-11_知行小酒馆_价值投资与巴菲特"
     }
   ],
   "transcript_summary": [

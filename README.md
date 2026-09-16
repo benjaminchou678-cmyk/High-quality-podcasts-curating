@@ -9,7 +9,7 @@
 
 ## 已包含的真实案例
 
-`examples/real-week-2026-09-07_2026-09-13/` 是一次完整真实试跑的公开副本：
+`examples/2026-09-07至2026-09-13_真实周报与逐字稿/` 是一次完整真实试跑的公开副本：
 
 - 11 个公开 RSS 来源全部读取成功；
 - 自然周内发现 6 个单集，来自 5 个节目；
@@ -42,6 +42,16 @@
 - `examples/sources.json`
 - `skills/podcast-weekly-collector/assets/default-sources.json`
 
+## 输出载体选择
+
+逐字稿清洗 Skill 支持两个输出接口：
+
+- **飞书文档**：创建或原地更新飞书逐字稿，适合团队阅读与归档。
+- **Markdown 文件**：生成可移植 `.md` 文件，适合 GitHub、版本管理和本地阅读。
+- **两者都要**：基于同一权威内容同时生成，保持标题、风险状态、阶段标题、说话人顺序和正文一致。
+
+如果用户没有明确指定，Skill 会在执行前主动询问选择“飞书文档 / Markdown / 两者”，不会擅自决定。
+
 ## 目录
 
 ```text
@@ -62,23 +72,24 @@
 ├── examples/
 │   ├── README.md
 │   ├── sources.json
-│   └── real-week-2026-09-07_2026-09-13/
+│   └── 2026-09-07至2026-09-13_真实周报与逐字稿/
 │       ├── manifest.json
 │       ├── weekly-report.md
 │       ├── weekly-report.html
-│       └── episodes/<episode_id>/
-│           ├── metadata.json
-│           └── transcript/
-│               ├── transcript.readable.md
-│               ├── dialogue.readable.json
-│               └── quality-report.json
+│       └── episodes/
+│           └── YYYY-MM-DD_节目名_简短标题/
+│               ├── metadata.json
+│               └── transcript/
+│                   ├── transcript.readable.md
+│                   ├── dialogue.readable.json
+│                   └── quality-report.json
 └── docs/architecture.md
 ```
 
 ## 查看真实演示
 
-- [真实周报 Markdown](examples/real-week-2026-09-07_2026-09-13/weekly-report.md)
-- [真实周报 HTML](examples/real-week-2026-09-07_2026-09-13/weekly-report.html)
+- [真实周报 Markdown](examples/2026-09-07至2026-09-13_真实周报与逐字稿/weekly-report.md)
+- [真实周报 HTML](examples/2026-09-07至2026-09-13_真实周报与逐字稿/weekly-report.html)
 - [6 篇完整逐字稿索引](examples/README.md)
 
 GitHub 默认不会直接执行 HTML，可下载后在浏览器打开；页面完全自包含，不依赖外部脚本或样式。
@@ -87,8 +98,8 @@ GitHub 默认不会直接执行 HTML，可下载后在浏览器打开；页面�
 
 ```bash
 python3 skills/podcast-transcript-cleaner/scripts/render_html_reader.py \
-  examples/real-week-2026-09-07_2026-09-13/manifest.json \
-  --output examples/real-week-2026-09-07_2026-09-13/weekly-report.html
+  examples/2026-09-07至2026-09-13_真实周报与逐字稿/manifest.json \
+  --output examples/2026-09-07至2026-09-13_真实周报与逐字稿/weekly-report.html
 ```
 
 ## 使用默认 11 个来源采集

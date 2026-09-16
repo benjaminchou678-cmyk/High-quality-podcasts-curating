@@ -36,7 +36,8 @@
 
 `episodes[]` 包含：
 
-- `episode_id`
+- `episode_id`：稳定机器标识，用于幂等与去重，不作为默认目录名
+- `folder_name`：可读目录名，格式为 `YYYY-MM-DD_节目名_简短标题`；同名时才追加短标识
 - `source_id`
 - `podcast_name`
 - `title`

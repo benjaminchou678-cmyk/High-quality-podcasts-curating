@@ -1,11 +1,22 @@
 ---
 name: podcast-weekly-collector
-description: 按指定自然周从公开 RSS 采集播客单集元信息，并按 RSS 逐字稿、公开节目页、公开音频 ASR 的优先级取得逐字稿。用于播客周采集、单集发现、逐字稿来源定位和 ASR 前置准备；不绕过登录、付费墙、robots 限制或访问控制。
+description: 按指定自然周从公开 RSS 采集播客单集元信息，并按 RSS 逐字稿、公开节目页、公开音频 ASR 的优先级取得逐字稿；进入逐字稿生成前主动询问用户选择输出为飞书文档、Markdown 文件或两者。用于播客周采集、单集发现、逐字稿来源定位和 ASR 前置准备；不绕过登录、付费墙、robots 限制或访问控制。
 ---
 
 # 播客周采集
 
 从用户提供的 RSS 清单中筛选指定时间区间内的单集，并为后续逐字稿清洗建立可追溯目录。
+
+## 输出选择与下游交付
+
+RSS 元数据和来源状态可以先采集，但在开始取得/清洗逐字稿或创建最终周报前，检查用户是否明确输出载体。
+
+- 未明确时主动询问：`本次逐字稿和周报希望输出为：A. 飞书文档；B. Markdown 文件；C. 两者都要？`
+- 记录 `output_targets`：`lark_doc`、`markdown` 或二者组成的数组，并传递给逐字稿清洗 Skill。
+- 选择飞书：调用清洗 Skill 的飞书分支，创建或原地更新逐字稿和周报。
+- 选择 Markdown：调用清洗 Skill 的 Markdown 分支，生成可移植的逐字稿及周报 `.md`，不写飞书。
+- 选择两者：基于同一内容同时生成，分别验证并交付。
+- 用户已明确选择时不重复询问；批量单集继承同一选择。
 
 ## 输入
 
@@ -54,7 +65,7 @@ python3 <skill-dir>/scripts/fetch_week.py \
 ]
 ```
 
-将其保存为 `episodes/<episode_id>/transcript/segments.raw.json`。没有 speaker 或 confidence 时省略字段，不填造默认值。
+将其保存为 `episodes/YYYY-MM-DD_节目名_简短标题/transcript/segments.raw.json`。完整 `episode_id` 只保存在元数据中；发生同名冲突时目录末尾追加 `episode_id` 前 6 位。没有 speaker 或 confidence 时省略字段，不填造默认值。
 
 ## 证据与状态
 
@@ -90,7 +101,7 @@ python3 <skill-dir>/scripts/fetch_week.py \
 ├── rss/
 ├── source-status/
 └── episodes/
-    └── <episode_id>/
+    └── YYYY-MM-DD_节目名_简短标题/
         ├── metadata.json
         ├── shownotes.raw.txt
         └── transcript/

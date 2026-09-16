@@ -136,6 +136,31 @@ def stable_id(source_id, guid, link, audio, title):
     return hashlib.sha256(f"{source_id}|{identity}".encode("utf-8")).hexdigest()[:16]
 
 
+def readable_component(value, max_length=44):
+    value = re.sub(r"[\\/:*?\"<>|\x00-\x1f]+", "-", str(value or ""))
+    value = re.sub(r"\s+", "", value).strip(" .-_—–｜")
+    value = re.sub(r"[-_]{2,}", "_", value)
+    return value[:max_length].rstrip(" .-_—–｜") or "未命名"
+
+
+def episode_folder_name(published, podcast_name, title, episode_id, episodes_root):
+    date = published.strftime("%Y-%m-%d")
+    base = f"{date}_{readable_component(podcast_name, 24)}_{readable_component(title, 44)}"
+    candidate = base
+    existing_metadata = episodes_root / candidate / "metadata.json"
+    if existing_metadata.exists():
+        try:
+            existing_id = json.loads(existing_metadata.read_text(encoding="utf-8")).get("episode_id")
+        except (OSError, json.JSONDecodeError):
+            existing_id = None
+        if existing_id == episode_id:
+            return candidate
+        candidate = f"{base}_{episode_id[:6]}"
+    elif (episodes_root / candidate).exists():
+        candidate = f"{base}_{episode_id[:6]}"
+    return candidate
+
+
 def validate_sources(sources):
     ids = set()
     for source in sources:
@@ -195,11 +220,13 @@ def run(sources_path, start_value, end_value, output):
                 audio_url = extract_audio(item)
                 description = child_text(item, {"description", "summary", "encoded", "content"})
                 episode_id = stable_id(source["id"], guid, episode_url, audio_url, title)
-                episode_dir = output / "episodes" / episode_id
+                folder_name = episode_folder_name(published, source["name"], title, episode_id, output / "episodes")
+                episode_dir = output / "episodes" / folder_name
                 episode_dir.mkdir(exist_ok=True)
                 candidates = transcript_candidates(item)
                 metadata = {
                     "episode_id": episode_id,
+                    "folder_name": folder_name,
                     "source_id": source["id"],
                     "podcast_name": source["name"],
                     "title": title,
