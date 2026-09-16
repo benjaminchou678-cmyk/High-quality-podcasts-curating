@@ -1,0 +1,44 @@
+[
+  {
+    "start_time": 0.0,
+    "end_time": 8.4,
+    "speaker": "1",
+    "text": "欢迎收听这段公开演示，我们会说明怎样把播客逐字稿做得可追溯。",
+    "mean_confidence": 0.98
+  },
+  {
+    "start_time": 8.8,
+    "end_time": 25.2,
+    "speaker": "2",
+    "text": "第一步是保留原始转写，不要直接覆盖证据文件，然后再生成面向阅读者的清洗版本。",
+    "mean_confidence": 0.955
+  },
+  {
+    "start_time": 26.0,
+    "end_time": 36.4,
+    "speaker": "3",
+    "text": "说话人编号只代表不同声纹，不需要确认真实身份。",
+    "mean_confidence": 0.94
+  },
+  {
+    "start_time": 37.0,
+    "end_time": 47.2,
+    "speaker": "1",
+    "text": "章节标题应该跟随时间插入正文，而不是生成很长的独立导航。",
+    "mean_confidence": 0.97
+  },
+  {
+    "start_time": 48.0,
+    "end_time": 58.5,
+    "speaker": "2",
+    "text": "如果置信度或者覆盖率存在风险，就明确标记出来。",
+    "mean_confidence": 0.92
+  },
+  {
+    "start_time": 59.0,
+    "end_time": 64.2,
+    "speaker": "1",
+    "text": "风险不会阻止生成和归档。",
+    "mean_confidence": 0.96
+  }
+]

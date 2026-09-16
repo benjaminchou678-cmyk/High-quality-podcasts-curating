@@ -1,0 +1,34 @@
+# macOS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets and local configuration
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+
+# Private media / raw processing data
+*.mp3
+*.m4a
+*.wav
+*.mp4
+*.mov
+*.aac
+*.flac
+asr-*.private.json
+segments.raw.private.json
+
+# Local output and caches
+output/
+artifacts/
+.tmp*/
+*.log
