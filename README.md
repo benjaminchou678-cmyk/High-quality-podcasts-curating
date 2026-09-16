@@ -34,7 +34,7 @@
 | 晚点聊 LateTalk | <https://feeds.fireside.fm/latetalk/rss> |
 | 卫诗婕｜漫谈Light the Star | <https://feed.xyzfm.space/4jjdlpq3khc9> |
 | 小Lin说 | <https://feed.xyzfm.space/mkkxu98dm89e> |
-| 张小珺Jùn｜商业访谈录 | <https://feed.xyzfm.space/dk4yh3pkpjp3> |
+| 张小珺｜商业访谈录 | <https://feed.xyzfm.space/dk4yh3pkpjp3> |
 | 知行小酒馆 | <https://feed.xyzfm.space/j8yp8gxkmgqr> |
 
 同一配置同时保存在：
