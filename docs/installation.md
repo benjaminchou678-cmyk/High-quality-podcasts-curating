@@ -1,23 +1,6 @@
-# 安装与同事分享指南
+# 安装指南
 
-## 一、先判断同事需要什么
-
-### 只阅读结果
-
-不需要安装 Skill。直接共享你维护的飞书播客资料库或 GitHub `examples/`，由你定期更新即可。
-
-适合：只关心周报和逐字稿、不需要独立抓取的同事。
-
-### 独立运行流程
-
-需要安装两个 Skill：
-
-- `podcast-weekly-collector`：读取 RSS、筛选自然周单集并准备转写任务。
-- `podcast-transcript-cleaner`：清洗逐字稿，输出飞书文档、Markdown 或两者。
-
-注意：安装 Skill 只提供工作流、脚本和输出规范，不会自动获得 ASR 服务或飞书权限。
-
-## 二、下载仓库
+## 一、下载仓库
 
 有 Git：
 
@@ -28,7 +11,7 @@ cd High-quality-podcasts-curating
 
 没有 Git：在 GitHub 仓库点击 `Code` → `Download ZIP`，解压后进入目录。
 
-## 三、确认 Skill 安装目录
+## 二、确认 Skill 安装目录
 
 不要盲目假设固定路径。目标应是该 Agent 环境实际加载的、路径以 `workspace/.user_skills` 结尾的目录。
 
@@ -55,7 +38,7 @@ cd High-quality-podcasts-curating
 
 不要只复制 `SKILL.md`；脚本、references 和 assets 都是 Skill 的一部分。
 
-## 四、使用安装脚本
+## 三、使用安装脚本
 
 Linux / macOS：
 
@@ -84,7 +67,7 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --overwrite
 
 脚本不会写入仓库以外的其他目录，不安装第三方依赖，也不写入账号凭据。
 
-## 五、重启或刷新 Agent
+## 四、重启或刷新 Agent
 
 复制完成后：
 
@@ -98,7 +81,7 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --overwrite
 请抓取上一个自然周的播客，并在开始逐字稿处理前询问我输出为飞书文档、Markdown 还是两者。
 ```
 
-## 六、运行前检查
+## 五、运行前检查
 
 ```bash
 python3 scripts/check_environment.py
@@ -114,7 +97,7 @@ python3 scripts/check_environment.py
 
 该脚本只做本地只读检查，不联网、不登录，也不会验证真实服务权限。
 
-## 七、能力分级
+## 六、能力分级
 
 | 能力 | 仅安装仓库即可 | 额外要求 |
 |---|---:|---|
@@ -128,7 +111,7 @@ python3 scripts/check_environment.py
 | 输出 Markdown | 是 | 本地文件写入能力 |
 | 输出飞书文档 | 否 | 飞书文档工具、登录和目标目录权限 |
 
-## 八、升级
+## 七、升级
 
 拉取新版本后重新运行安装脚本：
 
@@ -140,7 +123,7 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --overwrite
 
 升级前建议备份同事在 Skill 目录中的自定义修改。
 
-## 九、常见问题
+## 八、常见问题
 
 ### Skill 能看到，但不能转写音频
 
