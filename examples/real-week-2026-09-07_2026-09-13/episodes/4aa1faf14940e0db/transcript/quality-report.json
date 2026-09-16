@@ -1,0 +1,31 @@
+{
+  "risk_level": "notice",
+  "risks": [
+    {
+      "code": "long_gaps",
+      "severity": "notice",
+      "detail": "发现 1 处超过 10 秒的长静默或缺口。"
+    }
+  ],
+  "metrics": {
+    "segment_count": 318,
+    "nonempty_segment_count": 318,
+    "empty_text_count": 0,
+    "duration_coverage_ratio": 0.9905467511885895,
+    "low_confidence_ratio": 0.022082018927444796,
+    "very_low_confidence_ratio": 0.0,
+    "missing_speaker_ratio": 0.0,
+    "timestamp_order_errors": 0,
+    "long_gap_count": 1,
+    "long_gaps": [
+      {
+        "start_time": 609.98,
+        "end_time": 625.44,
+        "seconds": 15.460000000000036
+      }
+    ],
+    "deduplicated_exact_count": 0
+  },
+  "episode_id": "4aa1faf14940e0db",
+  "cleaning_version": "1.1.0"
+}

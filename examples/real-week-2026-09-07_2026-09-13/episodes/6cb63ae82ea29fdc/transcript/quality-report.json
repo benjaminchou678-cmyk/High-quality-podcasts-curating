@@ -1,0 +1,19 @@
+{
+  "risk_level": "normal",
+  "risks": [],
+  "metrics": {
+    "segment_count": 1782,
+    "nonempty_segment_count": 1782,
+    "empty_text_count": 0,
+    "duration_coverage_ratio": 0.9891975255046669,
+    "low_confidence_ratio": 0.006734006734006734,
+    "very_low_confidence_ratio": 0.0016835016835016834,
+    "missing_speaker_ratio": 0.0,
+    "timestamp_order_errors": 0,
+    "long_gap_count": 0,
+    "long_gaps": [],
+    "deduplicated_exact_count": 0
+  },
+  "episode_id": "6cb63ae82ea29fdc",
+  "cleaning_version": "1.1.0"
+}

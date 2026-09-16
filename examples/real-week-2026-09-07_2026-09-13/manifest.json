@@ -1,0 +1,263 @@
+{
+  "range": {
+    "start": "2026-09-07T00:00:00+08:00",
+    "end_exclusive": "2026-09-14T00:00:00+08:00"
+  },
+  "generated_at": "2026-09-16T13:18:44.958870+08:00",
+  "sources": [
+    {
+      "id": "42zhangjing",
+      "name": "42章经",
+      "feed_url": "https://feed.xyzfm.space/evgg6xle9rdc",
+      "status": "success",
+      "episode_count": 0,
+      "final_feed_url": "https://feed.xyzfm.space/evgg6xle9rdc",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "lex-fridman",
+      "name": "Lex Fridman Podcast",
+      "feed_url": "https://lexfridman.com/feed/podcast/",
+      "status": "success",
+      "episode_count": 0,
+      "final_feed_url": "https://lexfridman.com/feed/podcast/",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "high-energy",
+      "name": "高能量",
+      "feed_url": "https://feed.xyzfm.space/jhfuba3dahq8",
+      "status": "success",
+      "episode_count": 1,
+      "final_feed_url": "https://feed.xyzfm.space/jhfuba3dahq8",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "sv101",
+      "name": "硅谷101",
+      "feed_url": "https://feeds.fireside.fm/sv101/rss",
+      "status": "success",
+      "episode_count": 0,
+      "final_feed_url": "https://feeds.fireside.fm/sv101/rss",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "luanfanshu",
+      "name": "乱翻书",
+      "feed_url": "https://feed.xyzfm.space/yxuruh3f9mc4",
+      "status": "success",
+      "episode_count": 0,
+      "final_feed_url": "https://feed.xyzfm.space/yxuruh3f9mc4",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "crossing",
+      "name": "十字路口Crossing",
+      "feed_url": "https://feed.xyzfm.space/68fyjknth9hj",
+      "status": "success",
+      "episode_count": 1,
+      "final_feed_url": "https://feed.xyzfm.space/68fyjknth9hj",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "latetalk",
+      "name": "晚点聊 LateTalk",
+      "feed_url": "https://feeds.fireside.fm/latetalk/rss",
+      "status": "success",
+      "episode_count": 0,
+      "final_feed_url": "https://feeds.fireside.fm/latetalk/rss",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "weishijie",
+      "name": "卫诗婕｜漫谈Light the Star",
+      "feed_url": "https://feed.xyzfm.space/4jjdlpq3khc9",
+      "status": "success",
+      "episode_count": 2,
+      "final_feed_url": "https://feed.xyzfm.space/4jjdlpq3khc9",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "xiaolin",
+      "name": "小Lin说",
+      "feed_url": "https://feed.xyzfm.space/mkkxu98dm89e",
+      "status": "success",
+      "episode_count": 1,
+      "final_feed_url": "https://feed.xyzfm.space/mkkxu98dm89e",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "zhangxiaojun",
+      "name": "张小珺Jùn｜商业访谈录",
+      "feed_url": "https://feed.xyzfm.space/dk4yh3pkpjp3",
+      "status": "success",
+      "episode_count": 0,
+      "final_feed_url": "https://feed.xyzfm.space/dk4yh3pkpjp3",
+      "date_parse_failure_count": 0
+    },
+    {
+      "id": "cheers",
+      "name": "知行小酒馆",
+      "feed_url": "https://feed.xyzfm.space/j8yp8gxkmgqr",
+      "status": "success",
+      "episode_count": 1,
+      "final_feed_url": "https://feed.xyzfm.space/j8yp8gxkmgqr",
+      "date_parse_failure_count": 0
+    }
+  ],
+  "episodes": [
+    {
+      "episode_id": "e648ef332c84ccc7",
+      "source_id": "high-energy",
+      "podcast_name": "高能量",
+      "title": "Vol.234 宏观漫谈110｜全球流动性的困境与中国五类经济主体的金融结构转型（9.2录制）",
+      "published_at": "2026-09-07T16:46:18+08:00",
+      "episode_url": "https://www.xiaoyuzhoufm.com/episode/6a9e786ea0210c197dced93c?utm_source=rss",
+      "duration": "01:27:15",
+      "rss_transcript_candidates": [],
+      "transcript_status": "asr_transcript_generated",
+      "transcript_markdown": "episodes/e648ef332c84ccc7/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/e648ef332c84ccc7/transcript/dialogue.readable.json",
+      "quality_report": "episodes/e648ef332c84ccc7/transcript/quality-report.json"
+    },
+    {
+      "episode_id": "6cb63ae82ea29fdc",
+      "source_id": "crossing",
+      "podcast_name": "十字路口Crossing",
+      "title": "她被骗过、被救过、被捧上神坛过、被疼痛击倒过，决定在AI时代继续冒险｜对谈陈安妮",
+      "published_at": "2026-09-07T00:00:00+08:00",
+      "episode_url": "https://www.xiaoyuzhoufm.com/episode/6a9abd3df03e74ee6b052a28?utm_source=rss",
+      "duration": "01:16:47",
+      "rss_transcript_candidates": [],
+      "transcript_status": "asr_transcript_generated",
+      "transcript_markdown": "episodes/6cb63ae82ea29fdc/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/6cb63ae82ea29fdc/transcript/dialogue.readable.json",
+      "quality_report": "episodes/6cb63ae82ea29fdc/transcript/quality-report.json"
+    },
+    {
+      "episode_id": "cee14faa9638bb9f",
+      "source_id": "weishijie",
+      "podcast_name": "卫诗婕｜漫谈Light the Star",
+      "title": "87.蓝色光标 x AhaCreator官宣后首次访谈：营销巨头、AI 原生，与出海增长进行时",
+      "published_at": "2026-09-12T09:30:00+08:00",
+      "episode_url": "https://www.xiaoyuzhoufm.com/episode/6aa3c67d492687f6aad866a4?utm_source=rss",
+      "duration": "02:06:14",
+      "rss_transcript_candidates": [],
+      "transcript_status": "asr_transcript_generated",
+      "transcript_markdown": "episodes/cee14faa9638bb9f/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/cee14faa9638bb9f/transcript/dialogue.readable.json",
+      "quality_report": "episodes/cee14faa9638bb9f/transcript/quality-report.json"
+    },
+    {
+      "episode_id": "dad0c49ec1bbccea",
+      "source_id": "weishijie",
+      "podcast_name": "卫诗婕｜漫谈Light the Star",
+      "title": "86.「明年科技公司就只招 AI 人才了！」和脉脉CEO林凡聊全球 AI 人才动向、组织变革与大模型季报",
+      "published_at": "2026-09-07T09:00:00+08:00",
+      "episode_url": "https://www.xiaoyuzhoufm.com/episode/6a9daa7ea0210c197dce7a8b?utm_source=rss",
+      "duration": "01:25:05",
+      "rss_transcript_candidates": [],
+      "transcript_status": "asr_transcript_generated",
+      "transcript_markdown": "episodes/dad0c49ec1bbccea/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/dad0c49ec1bbccea/transcript/dialogue.readable.json",
+      "quality_report": "episodes/dad0c49ec1bbccea/transcript/quality-report.json"
+    },
+    {
+      "episode_id": "4aa1faf14940e0db",
+      "source_id": "xiaolin",
+      "podcast_name": "小Lin说",
+      "title": "特朗普关税被判违法，这一整年白忙了? 现在关税什么情况?",
+      "published_at": "2026-09-10T12:00:19+08:00",
+      "episode_url": "https://www.xiaoyuzhoufm.com/episode/6aa229e4492687f6aad7af0d?utm_source=rss",
+      "duration": "00:10:31",
+      "rss_transcript_candidates": [],
+      "transcript_status": "asr_transcript_generated",
+      "transcript_markdown": "episodes/4aa1faf14940e0db/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/4aa1faf14940e0db/transcript/dialogue.readable.json",
+      "quality_report": "episodes/4aa1faf14940e0db/transcript/quality-report.json"
+    },
+    {
+      "episode_id": "4bfe6adf6e9d5f9c",
+      "source_id": "cheers",
+      "podcast_name": "知行小酒馆",
+      "title": "E251 对话方言：你相信的是价值投资，还是巴菲特的造富神话？",
+      "published_at": "2026-09-11T20:00:00+08:00",
+      "episode_url": "https://www.xiaoyuzhoufm.com/episode/6aa37bcd492687f6aad83995?utm_source=rss",
+      "duration": "01:49:29",
+      "rss_transcript_candidates": [],
+      "transcript_status": "asr_transcript_generated",
+      "transcript_markdown": "episodes/4bfe6adf6e9d5f9c/transcript/transcript.readable.md",
+      "dialogue_path": "episodes/4bfe6adf6e9d5f9c/transcript/dialogue.readable.json",
+      "quality_report": "episodes/4bfe6adf6e9d5f9c/transcript/quality-report.json"
+    }
+  ],
+  "transcript_summary": [
+    {
+      "episode_id": "e648ef332c84ccc7",
+      "podcast_name": "高能量",
+      "title": "Vol.234 宏观漫谈110｜全球流动性的困境与中国五类经济主体的金融结构转型（9.2录制）",
+      "published_at": "2026-09-07T16:46:18+08:00",
+      "duration_coverage_ratio": 0.9867258834765998,
+      "mean_confidence": 0.9603661493342411,
+      "speaker_count": 2,
+      "risk_level": "normal",
+      "status": "asr_transcript_generated"
+    },
+    {
+      "episode_id": "6cb63ae82ea29fdc",
+      "podcast_name": "十字路口Crossing",
+      "title": "她被骗过、被救过、被捧上神坛过、被疼痛击倒过，决定在AI时代继续冒险｜对谈陈安妮",
+      "published_at": "2026-09-07T00:00:00+08:00",
+      "duration_coverage_ratio": 0.9891975255046669,
+      "mean_confidence": 0.9641598198040792,
+      "speaker_count": 2,
+      "risk_level": "normal",
+      "status": "asr_transcript_generated"
+    },
+    {
+      "episode_id": "cee14faa9638bb9f",
+      "podcast_name": "卫诗婕｜漫谈Light the Star",
+      "title": "87.蓝色光标 x AhaCreator官宣后首次访谈：营销巨头、AI 原生，与出海增长进行时",
+      "published_at": "2026-09-12T09:30:00+08:00",
+      "duration_coverage_ratio": 0.9870184842883549,
+      "mean_confidence": 0.9613461071348265,
+      "speaker_count": 2,
+      "risk_level": "normal",
+      "status": "asr_transcript_generated"
+    },
+    {
+      "episode_id": "dad0c49ec1bbccea",
+      "podcast_name": "卫诗婕｜漫谈Light the Star",
+      "title": "86.「明年科技公司就只招 AI 人才了！」和脉脉CEO林凡聊全球 AI 人才动向、组织变革与大模型季报",
+      "published_at": "2026-09-07T09:00:00+08:00",
+      "duration_coverage_ratio": 0.9926425073457394,
+      "mean_confidence": 0.9537332260771887,
+      "speaker_count": 2,
+      "risk_level": "notice",
+      "status": "asr_transcript_generated"
+    },
+    {
+      "episode_id": "4aa1faf14940e0db",
+      "podcast_name": "小Lin说",
+      "title": "特朗普关税被判违法，这一整年白忙了? 现在关税什么情况?",
+      "published_at": "2026-09-10T12:00:19+08:00",
+      "duration_coverage_ratio": 0.9905467511885895,
+      "mean_confidence": 0.9542095907680096,
+      "speaker_count": 2,
+      "risk_level": "notice",
+      "status": "asr_transcript_generated"
+    },
+    {
+      "episode_id": "4bfe6adf6e9d5f9c",
+      "podcast_name": "知行小酒馆",
+      "title": "E251 对话方言：你相信的是价值投资，还是巴菲特的造富神话？",
+      "published_at": "2026-09-11T20:00:00+08:00",
+      "duration_coverage_ratio": 0.9816084639975643,
+      "mean_confidence": 0.9578531363464978,
+      "speaker_count": 2,
+      "risk_level": "notice",
+      "status": "asr_transcript_generated"
+    }
+  ],
+  "publication_note": "公开副本：保留公开 RSS、节目页、清洗后逐字稿和质量指标；不包含音频文件、内部文档 token、私有任务记录或本地绝对路径。"
+}

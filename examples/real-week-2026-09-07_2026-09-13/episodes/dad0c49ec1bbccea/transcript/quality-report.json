@@ -1,0 +1,25 @@
+{
+  "risk_level": "notice",
+  "risks": [
+    {
+      "code": "automatic_chapters",
+      "severity": "notice",
+      "detail": "未发现可靠官方章节，使用每 15 分钟自动分段。"
+    }
+  ],
+  "metrics": {
+    "segment_count": 2003,
+    "nonempty_segment_count": 2003,
+    "empty_text_count": 0,
+    "duration_coverage_ratio": 0.9926425073457394,
+    "low_confidence_ratio": 0.010983524712930605,
+    "very_low_confidence_ratio": 0.000998502246630055,
+    "missing_speaker_ratio": 0.0,
+    "timestamp_order_errors": 0,
+    "long_gap_count": 0,
+    "long_gaps": [],
+    "deduplicated_exact_count": 0
+  },
+  "episode_id": "dad0c49ec1bbccea",
+  "cleaning_version": "1.1.0"
+}

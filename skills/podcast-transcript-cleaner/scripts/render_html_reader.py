@@ -75,8 +75,11 @@ def render(manifest_path, output_path):
         link_html = "".join(links)
         coverage = summary.get("duration_coverage_ratio")
         confidence = summary.get("mean_confidence")
+        speaker_count = summary.get("speaker_count")
+        risk_level = summary.get("risk_level", "unknown")
         coverage_text = f"{coverage:.1%}" if isinstance(coverage, (int, float)) else "—"
         confidence_text = f"{confidence:.1%}" if isinstance(confidence, (int, float)) else "—"
+        speaker_text = f"{speaker_count} 个声纹" if isinstance(speaker_count, int) and speaker_count > 0 else "声纹数未知"
         rows.append(
             "<tr>"
             f"<td>{esc(str(episode.get('published_at', ''))[:10])}</td>"
@@ -84,7 +87,7 @@ def render(manifest_path, output_path):
             f"<td><a class='transcript-link' href='#{anchor}' data-target='{anchor}'>{esc(episode.get('title'))}</a>"
             f"<div class='links'>{link_html}</div></td>"
             f"<td>{coverage_text}</td><td>{confidence_text}</td>"
-            "<td><span class='ok'>对话人分区已完成</span></td></tr>"
+            f"<td><span class='ok'>对话人分区已完成</span><small>{esc(speaker_text)} · {esc(risk_level)}</small></td></tr>"
         )
         turns = []
         for block in load_blocks(root, episode):
@@ -112,14 +115,19 @@ def render(manifest_path, output_path):
     start = manifest.get("range", {}).get("start", "")
     end = manifest.get("range", {}).get("end_exclusive", "")
     successful = sum(item.get("status") == "success" for item in sources)
+    completed = sum(item.get("status") == "asr_transcript_generated" for item in manifest.get("transcript_summary", []))
+    publication_note = manifest.get(
+        "publication_note",
+        "本页由公开 manifest 与清洗后对话数据生成，不包含音频或私有任务记录。",
+    )
     page = f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>播客周采集与逐字稿演示</title><style>
-:root{{--ink:#18202a;--muted:#65717d;--line:#dfe5e8;--accent:#176b65;--soft:#edf7f5}}*{{box-sizing:border-box}}html{{scroll-behavior:smooth}}body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;background:#f6f7f8;color:var(--ink);margin:0}}main{{max-width:1080px;margin:auto;padding:28px 18px 60px}}h1{{font-size:26px}}.kpis{{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}}.k{{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;min-width:140px}}.n{{font-size:25px;font-weight:700;color:var(--accent)}}.l,small{{font-size:12px;color:var(--muted)}}.note,.speaker-note{{padding:12px 14px;background:#fff8e8;border-left:4px solid #d89a2b;margin:16px 0}}.table-wrap{{overflow-x:auto}}table{{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;margin:12px 0 24px}}th,td{{padding:10px;border-bottom:1px solid #edf0f2;text-align:left;vertical-align:top;font-size:13px}}th{{background:var(--soft)}}a{{color:var(--accent);font-weight:600;text-decoration:none}}a:hover{{text-decoration:underline}}.links,.transcript-tools{{display:flex;flex-wrap:wrap;gap:12px}}.links{{margin-top:7px}}.external-link{{display:inline-block;padding:4px 8px;border:1px solid #c8d9d6;border-radius:7px;background:#fff;font-size:12px}}.ok{{color:#176b65;white-space:nowrap}}.transcript{{background:#fff;border:1px solid var(--line);border-radius:12px;margin:12px 0;scroll-margin-top:12px;overflow:hidden}}.transcript[open]{{border-color:#8bc8bd}}summary{{cursor:pointer;padding:15px;display:flex;gap:8px;flex-direction:column}}summary span{{font-size:12px;color:var(--muted)}}summary strong{{font-size:15px;line-height:1.5}}.transcript-tools{{padding:11px 15px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fafcfc}}.speaker-note{{margin:12px 15px;font-size:12px}}.dialogue{{padding:8px 15px 20px}}.turn{{max-width:88%;border-radius:12px;padding:10px 12px;margin:10px 0;border:1px solid var(--speaker-border);background:var(--speaker-bg)}}.turn.align-left{{margin-right:auto}}.turn.align-right{{margin-left:auto}}.who{{display:flex;justify-content:space-between;gap:12px;font-size:12px;margin-bottom:6px}}.who b{{color:var(--speaker-ink)}}.who span{{color:var(--muted)}}.turn p{{font-size:14px;line-height:1.7;margin:0;white-space:pre-wrap}}@media(max-width:700px){{main{{padding:18px 10px 40px}}th,td{{font-size:12px;padding:8px}}.turn{{max-width:96%}}}}
-</style></head><body><main><h1>播客周采集与逐字稿演示</h1>
+<title>播客周采集与逐字稿</title><style>
+:root{{--ink:#18202a;--muted:#65717d;--line:#dfe5e8;--accent:#176b65;--soft:#edf7f5}}*{{box-sizing:border-box}}html{{scroll-behavior:smooth}}body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;background:#f6f7f8;color:var(--ink);margin:0}}main{{max-width:1080px;margin:auto;padding:28px 18px 60px}}h1{{font-size:26px}}.kpis{{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}}.k{{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;min-width:140px}}.n{{font-size:25px;font-weight:700;color:var(--accent)}}.l,small{{font-size:12px;color:var(--muted)}}.note,.speaker-note{{padding:12px 14px;background:#fff8e8;border-left:4px solid #d89a2b;margin:16px 0}}.table-wrap{{overflow-x:auto}}table{{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;margin:12px 0 24px}}th,td{{padding:10px;border-bottom:1px solid #edf0f2;text-align:left;vertical-align:top;font-size:13px}}th{{background:var(--soft)}}a{{color:var(--accent);font-weight:600;text-decoration:none}}a:hover{{text-decoration:underline}}.links,.transcript-tools{{display:flex;flex-wrap:wrap;gap:12px}}.links{{margin-top:7px}}.external-link{{display:inline-block;padding:4px 8px;border:1px solid #c8d9d6;border-radius:7px;background:#fff;font-size:12px}}.ok{{color:#176b65;white-space:nowrap;display:block}}.ok+small{{display:block;margin-top:4px}}.transcript{{background:#fff;border:1px solid var(--line);border-radius:12px;margin:12px 0;scroll-margin-top:12px;overflow:hidden}}.transcript[open]{{border-color:#8bc8bd}}summary{{cursor:pointer;padding:15px;display:flex;gap:8px;flex-direction:column}}summary span{{font-size:12px;color:var(--muted)}}summary strong{{font-size:15px;line-height:1.5}}.transcript-tools{{padding:11px 15px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fafcfc}}.speaker-note{{margin:12px 15px;font-size:12px}}.dialogue{{padding:8px 15px 20px}}.turn{{max-width:88%;border-radius:12px;padding:10px 12px;margin:10px 0;border:1px solid var(--speaker-border);background:var(--speaker-bg)}}.turn.align-left{{margin-right:auto}}.turn.align-right{{margin-left:auto}}.who{{display:flex;justify-content:space-between;gap:12px;font-size:12px;margin-bottom:6px}}.who b{{color:var(--speaker-ink)}}.who span{{color:var(--muted)}}.turn p{{font-size:14px;line-height:1.7;margin:0;white-space:pre-wrap}}@media(max-width:700px){{main{{padding:18px 10px 40px}}th,td{{font-size:12px;padding:8px}}.turn{{max-width:96%}}}}
+</style></head><body><main><h1>播客周采集与逐字稿</h1>
 <p>{esc(str(start).replace('T', ' '))} 至 {esc(str(end).replace('T', ' '))}（结束不含）</p>
-<div class="kpis"><div class="k"><div class="n">{successful}/{len(sources)}</div><div class="l">RSS 来源成功</div></div><div class="k"><div class="n">{len(episodes)}</div><div class="l">区间内单集</div></div><div class="k"><div class="n">{len(episodes)}/{len(episodes)}</div><div class="l">对话人分区已完成</div></div></div>
-<div class="note">这是脱敏、缩短的结构演示，不包含完整节目逐字稿、音频或内部文档链接。</div>
+<div class="kpis"><div class="k"><div class="n">{successful}/{len(sources)}</div><div class="l">RSS 来源成功</div></div><div class="k"><div class="n">{len(episodes)}</div><div class="l">区间内单集</div></div><div class="k"><div class="n">{completed}/{len(episodes)}</div><div class="l">逐字稿完成</div></div></div>
+<div class="note">{esc(publication_note)}</div>
 <h2>单集与逐字稿</h2><div class="table-wrap"><table><tr><th>日期</th><th>节目</th><th>单集</th><th>覆盖</th><th>平均置信度</th><th>状态</th></tr>{''.join(rows)}</table></div>
 <h2>逐字稿正文</h2>{''.join(sections)}
 <h2>来源状态</h2><div class="table-wrap"><table><tr><th>节目</th><th>状态</th><th>单集数</th></tr>{source_rows}</table></div>
