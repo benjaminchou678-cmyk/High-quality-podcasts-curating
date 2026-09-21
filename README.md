@@ -4,7 +4,7 @@
 
 仓库包含两部分能力：
 
-1. `podcast-weekly-collector`：按自然周读取 11 个公开 RSS，定位新单集，并按“RSS 逐字稿 → 公开节目页 → 公开音频 ASR”顺序取得逐字稿。
+1. `podcast-weekly-collector`：按自然周读取 23 个公开 RSS，定位新单集，并按“RSS 逐字稿 → 公开节目页 → 公开音频 ASR”顺序取得逐字稿。
 2. `podcast-transcript-cleaner`：保留原始证据，执行确定性轻编辑；单人节目统一为 `说话人1`，多人节目按稳定声纹连续编号且不限制人数；在完整逐字稿前生成最多两层、带时间证据的议题提要，并输出质量风险标记、Markdown、JSON 与 HTML 阅读版。
 
 ## 已包含的真实案例
@@ -21,7 +21,7 @@
 
 这些文档保留公开节目页、时间戳、阶段标题和说话人编号；不包含音频文件、私有 ASR 任务记录、内部文档 token、账号信息或本地绝对路径。
 
-## 11 个公开来源
+## 23 个公开来源
 
 | 节目 | RSS |
 |---|---|
@@ -36,11 +36,21 @@
 | 小Lin说 | <https://feed.xyzfm.space/mkkxu98dm89e> |
 | 张小珺｜商业访谈录 | <https://feed.xyzfm.space/dk4yh3pkpjp3> |
 | 知行小酒馆 | <https://feed.xyzfm.space/j8yp8gxkmgqr> |
+| 疯投圈 | <https://crazy.capital/feed> |
+| OnBoard! | <https://feed.xyzfm.space/xxg7ryklkkft> |
+| 三五环 | <https://proxy.wavpub.com/35huan.xml> |
+| Hard Fork | <https://feeds.simplecast.com/6HKOhNgS> |
+| All-In Podcast | <https://rss.libsyn.com/shows/254861/destinations/1928300.xml> |
+| Lenny's Podcast | <https://api.substack.com/feed/podcast/10845.rss> |
+| Dwarkesh Podcast | <https://apple.dwarkesh-podcast.workers.dev/feed.rss> |
+| The Twenty Minute VC | <https://rss.libsyn.com/shows/61840/destinations/240976.xml> |
+| a16z Podcast | <https://feeds.simplecast.com/JGE3yC0V> |
+| Latent Space | <https://api.substack.com/feed/podcast/1084089.rss> |
+| NVIDIA AI 前沿 | <https://feeds.megaphone.fm/nvidiaaipodcast> |
+| The Prompt | <https://feeds.captivate.fm/fast-foundations/> |
 
-同一配置同时保存在：
-
-- `examples/sources.json`
-- `skills/podcast-weekly-collector/assets/default-sources.json`
+当前默认配置保存在 `skills/podcast-weekly-collector/assets/default-sources.json`。
+`examples/sources.json` 是历史真实周样例的 11 项来源快照，为保证样例可复现而保持不变。
 
 ## 分享与安装
 
@@ -139,7 +149,7 @@ python3 skills/podcast-transcript-cleaner/scripts/render_html_reader.py \
   --output examples/2026-09-07至2026-09-13_真实周报与逐字稿/weekly-report.html
 ```
 
-## 使用默认 11 个来源采集
+## 使用默认 23 个来源采集
 
 ```bash
 python3 skills/podcast-weekly-collector/scripts/fetch_week.py \

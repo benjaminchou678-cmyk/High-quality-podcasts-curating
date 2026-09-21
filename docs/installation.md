@@ -91,7 +91,7 @@ python3 scripts/check_environment.py
 
 - Python 版本；
 - 两个 Skill 是否完整；
-- 11 个 RSS 配置是否可解析；
+- 23 个 RSS 配置是否可解析；
 - 可选的 Git、GitHub CLI；
 - 可选 ASR / 飞书通道提示。
 

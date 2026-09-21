@@ -53,5 +53,65 @@
     "id": "cheers",
     "name": "知行小酒馆",
     "feed_url": "https://feed.xyzfm.space/j8yp8gxkmgqr"
+  },
+  {
+    "id": "crazy-capital",
+    "name": "疯投圈",
+    "feed_url": "https://crazy.capital/feed"
+  },
+  {
+    "id": "onboard",
+    "name": "OnBoard!",
+    "feed_url": "https://feed.xyzfm.space/xxg7ryklkkft"
+  },
+  {
+    "id": "sanwuhuan",
+    "name": "三五环",
+    "feed_url": "https://proxy.wavpub.com/35huan.xml"
+  },
+  {
+    "id": "hard-fork",
+    "name": "Hard Fork",
+    "feed_url": "https://feeds.simplecast.com/6HKOhNgS"
+  },
+  {
+    "id": "all-in-podcast",
+    "name": "All-In Podcast",
+    "feed_url": "https://rss.libsyn.com/shows/254861/destinations/1928300.xml"
+  },
+  {
+    "id": "lennys-podcast",
+    "name": "Lenny's Podcast",
+    "feed_url": "https://api.substack.com/feed/podcast/10845.rss"
+  },
+  {
+    "id": "dwarkesh-podcast",
+    "name": "Dwarkesh Podcast",
+    "feed_url": "https://apple.dwarkesh-podcast.workers.dev/feed.rss"
+  },
+  {
+    "id": "twenty-minute-vc",
+    "name": "The Twenty Minute VC",
+    "feed_url": "https://rss.libsyn.com/shows/61840/destinations/240976.xml"
+  },
+  {
+    "id": "a16z-podcast",
+    "name": "a16z Podcast",
+    "feed_url": "https://feeds.simplecast.com/JGE3yC0V"
+  },
+  {
+    "id": "latent-space",
+    "name": "Latent Space",
+    "feed_url": "https://api.substack.com/feed/podcast/1084089.rss"
+  },
+  {
+    "id": "nvidia-ai-podcast",
+    "name": "NVIDIA AI 前沿",
+    "feed_url": "https://feeds.megaphone.fm/nvidiaaipodcast"
+  },
+  {
+    "id": "the-prompt",
+    "name": "The Prompt",
+    "feed_url": "https://feeds.captivate.fm/fast-foundations/"
   }
 ]

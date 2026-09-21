@@ -20,7 +20,7 @@ RSS 元数据和来源状态可以先采集，但在开始取得/清洗逐字稿
 
 ## 输入
 
-- `sources.json`：节目 ID、名称和公开 RSS URL。默认跟踪清单见 [`assets/default-sources.json`](assets/default-sources.json)，当前包含 11 个公开来源。
+- `sources.json`：节目 ID、名称和公开 RSS URL。默认跟踪清单见 [`assets/default-sources.json`](assets/default-sources.json)，当前包含 23 个公开来源。
 - `--start`：含时区的区间起点，包含。
 - `--end`：含时区的区间终点，不包含。
 - 输出目录：用于保存 manifest、RSS、单集元信息与原始节目简介。
