@@ -34,7 +34,11 @@ transcript/
 - `duration_coverage_ratio`：实际 ASR 时长 / 元信息时长。
 - `low_confidence_ratio`：置信度低于 0.80 的片段比例。
 - `very_low_confidence_ratio`：置信度低于 0.60 的片段比例。
-- `missing_speaker_ratio`：非空片段中 speaker 缺失比例。
+- `missing_speaker_ratio`：归一后无 speaker 的非空片段比例。
+- `speaker_mode_requested` / `speaker_mode_resolved`：请求模式与实际解析模式。
+- `raw_speaker_count` / `normalized_speaker_count`：原始标签数量与归一后说话人数。
+- `raw_missing_speaker_ratio`：归一前 speaker 缺失比例。
+- `speaker_segment_counts` / `speaker_remap`：归一后各说话人片段数与原始标签映射。
 - `timestamp_order_errors`：开始时间逆序次数。
 - `long_gap_count`：相邻片段间隔超过 10 秒的次数。
 - `empty_text_count`：空正文片段数。
@@ -53,11 +57,11 @@ transcript/
 
 ### notice
 
-任一：自动章节；0.90 ≤ 覆盖率 < 0.95；0.05 ≤ 低置信比例 < 0.15；1–3 个长静默。
+任一：自动章节；0.90 ≤ 覆盖率 < 0.95；0.05 ≤ 低置信比例 < 0.15；1–3 个长静默；多人模式发现稀有声纹聚类但不自动合并；单人模式将多个 ASR 声纹聚类统一为说话人1。
 
 ### review_recommended
 
-任一：0.75 ≤ 覆盖率 < 0.90；0.15 ≤ 低置信比例 < 0.30；speaker 缺失；置信度不可用；长静默超过 3 个。
+任一：0.75 ≤ 覆盖率 < 0.90；0.15 ≤ 低置信比例 < 0.30；speaker 缺失、预期人数不一致或模式无法可靠确定；置信度不可用；长静默超过 3 个。
 
 ### high_risk
 

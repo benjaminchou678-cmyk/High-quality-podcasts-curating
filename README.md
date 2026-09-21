@@ -5,7 +5,7 @@
 仓库包含两部分能力：
 
 1. `podcast-weekly-collector`：按自然周读取 11 个公开 RSS，定位新单集，并按“RSS 逐字稿 → 公开节目页 → 公开音频 ASR”顺序取得逐字稿。
-2. `podcast-transcript-cleaner`：保留原始证据，执行确定性轻编辑、多说话人分区、正文内阶段标题和质量风险标记，生成 Markdown、JSON 与 HTML 阅读版。
+2. `podcast-transcript-cleaner`：保留原始证据，执行确定性轻编辑；单人节目统一为 `说话人1`，多人节目按稳定声纹连续编号且不限制人数；在完整逐字稿前生成最多两层、带时间证据的议题提要，并输出质量风险标记、Markdown、JSON 与 HTML 阅读版。
 
 ## 已包含的真实案例
 
@@ -90,7 +90,10 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --dry-run --overwr
 │   │   └── scripts/fetch_week.py
 │   └── podcast-transcript-cleaner/
 │       ├── SKILL.md
-│       ├── references/format-and-risk.md
+│       ├── references/
+│       │   ├── format-and-risk.md
+│       │   ├── speaker-modes.md
+│       │   └── topic-digest.md
 │       └── scripts/
 │           ├── clean_transcript.py
 │           ├── render_html_reader.py
@@ -102,6 +105,8 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --dry-run --overwr
 ├── scripts/
 │   ├── check_environment.py
 │   └── install_skills.py
+├── tests/
+│   └── test_clean_transcript.py
 └── examples/
     ├── README.md
     ├── sources.json
@@ -152,7 +157,15 @@ python3 skills/podcast-weekly-collector/scripts/fetch_week.py \
 python3 skills/podcast-transcript-cleaner/scripts/clean_transcript.py <episode-dir>
 ```
 
-输入目录需要包含 `metadata.json`、`shownotes.raw.txt`（可选）、`transcript/segments.raw.json` 和 `transcript/transcript.meta.json`。
+输入目录需要包含 `metadata.json`、`shownotes.raw.txt`（可选）、`transcript/segments.raw.json` 和 `transcript/transcript.meta.json`。可在 `metadata.json` 设置 `speaker_mode` 为 `single`、`multi` 或 `auto`；省略时自动判定。单人模式会统一为 `说话人1`，多人模式按原始声纹首次出现顺序编号且不限制人数。
+
+若提供 `transcript/topic-digest.json`，清洗脚本会在完整逐字稿前渲染最多两层、每项带时间范围的“议题提要”；缺失时保持向后兼容并省略该区块。
+
+运行回归测试：
+
+```bash
+python3 tests/test_clean_transcript.py
+```
 
 ## 数据与使用边界
 
