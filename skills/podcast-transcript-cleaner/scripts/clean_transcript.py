@@ -8,7 +8,7 @@ import math
 import re
 from pathlib import Path
 
-END_PUNCT = tuple("。！？…?!.")
+END_PUNCT = tuple("。！？…?!")
 
 
 def load_json(path):
@@ -58,54 +58,10 @@ def canonical_segments(raw):
             "speaker": str(speaker) if speaker not in (None, "") else "未确定",
             "text": normalize_text(item.get("text", item.get("subtitle_text", ""))),
         }
-        translation = normalize_text(item.get("translation_zh", item.get("text_zh", "")))
-        if translation:
-            record["translation_zh"] = translation
         if isinstance(item.get("confidence"), (int, float)):
             record["confidence"] = float(item["confidence"])
         segments.append(record)
     return segments
-
-
-def apply_translations(segments, raw_translations):
-    if raw_translations in (None, {}):
-        return segments, {"provided": 0, "matched": 0, "unmatched": 0}
-    records = raw_translations.get("items") if isinstance(raw_translations, dict) else raw_translations
-    if not isinstance(records, list):
-        raise ValueError("translations.zh.json must be an array or an object with an items array")
-    by_range = {}
-    for index, item in enumerate(records, 1):
-        if not isinstance(item, dict):
-            raise ValueError(f"translation item {index} must be an object")
-        start = float(item.get("start_time", 0) or 0)
-        end = float(item.get("end_time", start) or start)
-        text = normalize_text(item.get("translation_zh", item.get("text_zh", item.get("text", ""))))
-        if text:
-            by_range[(round(start, 3), round(end, 3))] = text
-    matched = 0
-    for segment in segments:
-        key = (round(segment["start_time"], 3), round(segment["end_time"], 3))
-        if key in by_range:
-            segment["translation_zh"] = by_range[key]
-            matched += 1
-    return segments, {"provided": len(by_range), "matched": matched, "unmatched": len(by_range) - matched}
-
-
-def english_character_ratio(text):
-    letters = len(re.findall(r"[A-Za-z]", text or ""))
-    cjk = len(re.findall(r"[\u4e00-\u9fff]", text or ""))
-    total = letters + cjk
-    return letters / total if total else 0.0
-
-
-def translation_mode(metadata, segments):
-    language = str(metadata.get("transcript_language", metadata.get("language", "")) or "").lower()
-    explicitly_english = language.startswith("en")
-    bilingual = metadata.get("bilingual") is True or str(metadata.get("translation_mode", "")).lower() in {"bilingual", "zh_en", "en_zh"}
-    nonempty = [segment for segment in segments if segment["text"]]
-    detected_english = bool(nonempty) and sum(english_character_ratio(segment["text"]) >= 0.7 for segment in nonempty) >= max(1, math.ceil(len(nonempty) * 0.8))
-    required = explicitly_english or bilingual or detected_english
-    return {"required": required, "language": "en" if required else (language or "unknown")}
 
 
 def resolve_speakers(segments, metadata):
@@ -208,7 +164,6 @@ def merge_segments(segments, max_gap=3.0, max_chars=420):
         long_gap = bool(blocks and segment["start_time"] - blocks[-1]["end_time"] > 10)
         can_merge = (
             blocks and not long_gap and blocks[-1]["speaker"] == segment["speaker"]
-            and bool(blocks[-1].get("translation_zh")) == bool(segment.get("translation_zh"))
             and segment["start_time"] - blocks[-1]["end_time"] <= max_gap
             and len(blocks[-1]["text"]) + len(segment["text"]) <= max_chars
         )
@@ -217,16 +172,12 @@ def merge_segments(segments, max_gap=3.0, max_chars=420):
             joiner = "" if previous["text"].endswith(("，", "。", "！", "？", ",", ".", "!", "?", "…")) else "，"
             previous["text"] += joiner + segment["text"]
             previous["end_time"] = max(previous["end_time"], segment["end_time"])
-            if segment.get("translation_zh"):
-                translation_joiner = "" if previous.get("translation_zh", "").endswith(END_PUNCT) else "，"
-                previous["translation_zh"] = previous.get("translation_zh", "") + translation_joiner + segment["translation_zh"]
             if "confidence" in segment:
                 previous["confidences"].append(segment["confidence"])
         else:
             blocks.append({
                 "start_time": segment["start_time"], "end_time": segment["end_time"],
                 "speaker": segment["speaker"], "text": segment["text"],
-                "translation_zh": segment.get("translation_zh", ""),
                 "confidences": [segment["confidence"]] if "confidence" in segment else [],
             })
     for block in blocks:
@@ -263,7 +214,7 @@ def extract_chapters(shownotes, duration):
     ], True
 
 
-def quality(segments, expected_duration, actual_duration, automatic_chapters, upstream, speaker_info, translation_info):
+def quality(segments, expected_duration, actual_duration, automatic_chapters, upstream, speaker_info):
     nonempty = [segment for segment in segments if segment["text"]]
     confidences = [segment["confidence"] for segment in segments if isinstance(segment.get("confidence"), (int, float))]
     missing_speakers = sum(segment["speaker"] == "未确定" for segment in nonempty)
@@ -315,9 +266,6 @@ def quality(segments, expected_duration, actual_duration, automatic_chapters, up
     rare_labels = speaker_info.get("rare_raw_speaker_labels", [])
     if rare_labels:
         add("rare_speaker_cluster", "notice", f"多人模式发现 {len(rare_labels)} 个稀有声纹聚类，未自动合并，建议抽查。")
-    if translation_info.get("required") and translation_info.get("missing_count", 0):
-        code = "translation_unavailable" if translation_info.get("coverage_ratio") == 0 else "translation_incomplete"
-        add(code, "review_recommended", f"英文逐字稿中文翻译覆盖率为 {translation_info.get('coverage_ratio', 0):.1%}。")
     if len(gaps) > 3:
         add("long_gaps", "review_recommended", f"发现 {len(gaps)} 处超过 10 秒的长静默或缺口。")
     elif gaps:
@@ -341,10 +289,6 @@ def quality(segments, expected_duration, actual_duration, automatic_chapters, up
             "raw_missing_speaker_ratio": speaker_info.get("raw_missing_speaker_ratio"),
             "speaker_segment_counts": speaker_info.get("speaker_segment_counts"),
             "speaker_remap": speaker_info.get("speaker_remap"),
-            "translation_required": translation_info.get("required", False),
-            "translation_coverage_ratio": translation_info.get("coverage_ratio"),
-            "translation_missing_count": translation_info.get("missing_count", 0),
-            "translation_unmatched_count": translation_info.get("unmatched", 0),
             "timestamp_order_errors": order_errors,
             "long_gap_count": len(gaps), "long_gaps": gaps,
         },
@@ -427,8 +371,7 @@ def build_markdown(metadata, chapters, blocks, report, topic_digest=None):
         f"# {md_escape(date)}｜{md_escape(podcast)}｜{md_escape(title)}", "",
         "> ASR 机器转写，未经人工校对。",
         f"> 质量状态：{risk_names[report['risk_level']]}。{md_escape(reason_text)}",
-        "> 说话人编号仅表示本文内不同声纹，不代表真实身份。",
-        *( ["> 英文访谈采用中文译文在上、英文原文在下；英文原文为证据层。"] if report.get("metrics", {}).get("translation_required") else [] ), "",
+        "> 说话人编号仅表示本文内不同声纹，不代表真实身份。", "",
         f"- **节目**：{md_escape(podcast)}", f"- **发布日期**：{md_escape(date)}",
         f"- **音频时长**：{md_escape(metadata.get('duration', ''))}",
         f"- **原节目页**：{metadata.get('episode_url', '')}", f"- **文字来源**：{md_escape(source)}", "",
@@ -444,12 +387,10 @@ def build_markdown(metadata, chapters, blocks, report, topic_digest=None):
             chapter_index += 1
         speaker = "未确定" if block["speaker"] == "未确定" else block["speaker"]
         confidence_mark = " · [低置信]" if isinstance(block.get("mean_confidence"), (int, float)) and block["mean_confidence"] < 0.80 else ""
-        speaker_line = f"**{md_escape('说话人未确定' if block['speaker'] == '未确定' else '说话人' + block['speaker'])}** · {stamp(block['start_time'])}{confidence_mark}"
-        if report.get("metrics", {}).get("translation_required"):
-            translation = block.get("translation_zh") or "[中文译文待补]"
-            lines.extend([speaker_line, "", md_escape(translation), "", "> **英文原文**", f"> {md_escape(block['text'])}", ""])
-        else:
-            lines.extend([speaker_line, "", md_escape(block["text"]), ""])
+        lines.extend([
+            f"**{md_escape('说话人未确定' if block['speaker'] == '未确定' else '说话人' + block['speaker'])}** · {stamp(block['start_time'])}{confidence_mark}", "",
+            md_escape(block["text"]), "",
+        ])
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -464,17 +405,6 @@ def clean_episode(episode_directory):
     upstream_path = transcript_directory / "transcript.meta.json"
     upstream = load_json(upstream_path) if upstream_path.exists() else {}
     segments = canonical_segments(load_json(segments_path))
-    translations_path = transcript_directory / "translations.zh.json"
-    segments, translation_load = apply_translations(segments, load_json(translations_path) if translations_path.exists() else None)
-    mode = translation_mode(metadata, segments)
-    english_segments = [segment for segment in segments if segment["text"] and english_character_ratio(segment["text"]) >= 0.7]
-    translated_count = sum(bool(segment.get("translation_zh")) for segment in english_segments)
-    translation_info = {
-        "required": mode["required"],
-        "coverage_ratio": translated_count / len(english_segments) if mode["required"] and english_segments else (1.0 if not mode["required"] else 0.0),
-        "missing_count": len(english_segments) - translated_count if mode["required"] else 0,
-        "unmatched": translation_load["unmatched"],
-    }
     segments, speaker_info = resolve_speakers(segments, metadata)
     segments, removed = exact_deduplicate(segments)
     blocks = merge_segments(segments)
@@ -486,11 +416,11 @@ def clean_episode(episode_directory):
     chapters, automatic = extract_chapters(shownotes, actual)
     topic_digest_path = transcript_directory / "topic-digest.json"
     topic_digest = validate_topic_digest(load_json(topic_digest_path) if topic_digest_path.exists() else None, actual)
-    report = quality(segments, expected, actual, automatic, upstream, speaker_info, translation_info)
+    report = quality(segments, expected, actual, automatic, upstream, speaker_info)
     report["metrics"]["deduplicated_exact_count"] = len(removed)
     report["metrics"]["topic_digest_count"] = len(topic_digest["items"])
     report["episode_id"] = metadata.get("episode_id")
-    report["cleaning_version"] = "1.4.0"
+    report["cleaning_version"] = "1.3.0"
     render_metadata = dict(metadata)
     render_metadata["transcript_source"] = "ASR" if upstream.get("acquisition_method") == "asr" else upstream.get("acquisition_method", "未知")
     transcript_directory.mkdir(parents=True, exist_ok=True)
@@ -498,15 +428,12 @@ def clean_episode(episode_directory):
     (transcript_directory / "quality-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     (transcript_directory / "transcript.readable.md").write_text(build_markdown(render_metadata, chapters, blocks, report, topic_digest), encoding="utf-8")
     upstream["cleaning"] = {
-        "version": "1.4.0",
+        "version": "1.3.0",
         "risk_level": report["risk_level"],
         "risk_codes": [risk["code"] for risk in report["risks"]],
         "speaker_mode_requested": speaker_info["speaker_mode_requested"],
         "speaker_mode_resolved": speaker_info["speaker_mode_resolved"],
         "normalized_speaker_count": speaker_info["normalized_speaker_count"],
-        "translation_required": translation_info["required"],
-        "translation_coverage_ratio": translation_info["coverage_ratio"],
-        "translation_file": "translations.zh.json" if translations_path.exists() else None,
         "topic_digest_file": "topic-digest.json" if topic_digest_path.exists() else None,
         "topic_digest_count": len(topic_digest["items"]),
         "readable_file": "transcript.readable.md",
