@@ -11,7 +11,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
-def write_episode(root, name, metadata, segments, topic_digest=None):
+def write_episode(root, name, metadata, segments, topic_digest=None, translations=None):
     episode = root / name
     transcript = episode / "transcript"
     transcript.mkdir(parents=True)
@@ -29,6 +29,8 @@ def write_episode(root, name, metadata, segments, topic_digest=None):
     (transcript / "transcript.meta.json").write_text(json.dumps({"acquisition_method": "asr", "quality": {"audio_duration_seconds": 60}}, ensure_ascii=False), encoding="utf-8")
     if topic_digest is not None:
         (transcript / "topic-digest.json").write_text(json.dumps(topic_digest, ensure_ascii=False), encoding="utf-8")
+    if translations is not None:
+        (transcript / "translations.zh.json").write_text(json.dumps(translations, ensure_ascii=False), encoding="utf-8")
     return episode
 
 
@@ -88,7 +90,53 @@ def main():
         assert "说话人1" in unknown_md and "说话人未确定" in unknown_md
         assert "only-known" not in unknown_md
 
-    print("speaker mode and topic digest tests passed")
+        bilingual = write_episode(root, "bilingual", {"transcript_language": "en", "speaker_mode": "multi"}, [
+            {"start_time": 0, "end_time": 5, "speaker": "host", "text": "Welcome to the show.", "confidence": 0.99},
+            {"start_time": 6, "end_time": 12, "speaker": "guest", "text": "Artificial intelligence changes scientific discovery.", "confidence": 0.99},
+        ], {
+            "version": "1.0", "source": "transcript", "items": [{
+                "topic": "人工智能如何改变科学发现", "summary": "嘉宾讨论人工智能对科研流程的影响。", "start_time": 0, "end_time": 12,
+                "points": [{"text": "节目以主题介绍开场。", "start_time": 0, "end_time": 5}],
+            }],
+        }, {"items": [
+            {"start_time": 0, "end_time": 5, "translation_zh": "欢迎来到本期节目。"},
+            {"start_time": 6, "end_time": 12, "translation_zh": "人工智能正在改变科学发现。"},
+        ]})
+        module.clean_episode(bilingual)
+        bilingual_blocks = load(bilingual / "transcript" / "dialogue.readable.json")
+        bilingual_report = load(bilingual / "transcript" / "quality-report.json")
+        bilingual_md = (bilingual / "transcript" / "transcript.readable.md").read_text(encoding="utf-8")
+        assert bilingual_report["metrics"]["translation_required"] is True
+        assert bilingual_report["metrics"]["translation_coverage_ratio"] == 1.0
+        assert all(block.get("translation_zh") for block in bilingual_blocks)
+        assert bilingual_md.index("欢迎来到本期节目") < bilingual_md.index("Welcome to the show")
+        assert "> **英文原文**" in bilingual_md
+        assert "人工智能如何改变科学发现" in bilingual_md
+
+        incomplete = write_episode(root, "incomplete", {"transcript_language": "en"}, [
+            {"start_time": 0, "end_time": 5, "speaker": "one", "text": "First English sentence.", "confidence": 0.99},
+            {"start_time": 6, "end_time": 11, "speaker": "one", "text": "Second English sentence.", "confidence": 0.99},
+        ], translations={"items": [
+            {"start_time": 0, "end_time": 5, "translation_zh": "第一句英文的中文翻译。"},
+        ]})
+        module.clean_episode(incomplete)
+        incomplete_report = load(incomplete / "transcript" / "quality-report.json")
+        incomplete_md = (incomplete / "transcript" / "transcript.readable.md").read_text(encoding="utf-8")
+        assert incomplete_report["metrics"]["translation_coverage_ratio"] == 0.5
+        assert incomplete_report["metrics"]["translation_missing_count"] == 1
+        assert "translation_incomplete" in {risk["code"] for risk in incomplete_report["risks"]}
+        assert "中文译文待补" in incomplete_md
+
+        chinese = write_episode(root, "chinese", {}, [
+            {"start_time": 0, "end_time": 5, "speaker": "one", "text": "这是一段中文访谈。", "confidence": 0.99},
+        ])
+        module.clean_episode(chinese)
+        chinese_report = load(chinese / "transcript" / "quality-report.json")
+        chinese_md = (chinese / "transcript" / "transcript.readable.md").read_text(encoding="utf-8")
+        assert chinese_report["metrics"]["translation_required"] is False
+        assert "英文原文" not in chinese_md
+
+    print("speaker mode, topic digest, and bilingual transcript tests passed")
 
 
 if __name__ == "__main__":
