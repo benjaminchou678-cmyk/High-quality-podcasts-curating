@@ -12,6 +12,20 @@ import sys
 from pathlib import Path
 
 SKILLS = ("podcast-weekly-collector", "podcast-transcript-cleaner")
+REQUIRED_SKILL_FILES = {
+    "podcast-weekly-collector": (
+        "scripts/fetch_week.py",
+        "scripts/import_minutes_transcript.py",
+        "scripts/render_minutes_summary.py",
+        "references/feishu-minutes-workflow.md",
+        "references/asr-contract.md",
+    ),
+    "podcast-transcript-cleaner": (
+        "scripts/clean_transcript.py",
+        "references/topic-digest.md",
+        "references/speaker-modes.md",
+    ),
+}
 ASR_HINTS = (
     "mediakit-cli",
     "whisper",
@@ -41,12 +55,16 @@ def main() -> int:
     for name in SKILLS:
         root = skills_root / name
         skill_md = root / "SKILL.md"
+        required_files = list(REQUIRED_SKILL_FILES.get(name, ()))
         skill_checks.append({
             "name": name,
             "root": str(root),
             "directory_exists": root.is_dir(),
             "skill_md_exists": skill_md.is_file(),
             "scripts_directory_exists": (root / "scripts").is_dir(),
+            "required_files": {
+                relative: (root / relative).is_file() for relative in required_files
+            },
         })
 
     sources_path = skills_root / "podcast-weekly-collector" / "assets" / "default-sources.json"
@@ -73,18 +91,24 @@ def main() -> int:
         "optional_commands": {
             "git": command_status("git"),
             "github_cli": command_status("gh"),
-            "asr_hints": [command_status(name) for name in ASR_HINTS],
-            "lark_hints": [command_status(name) for name in LARK_HINTS],
+            "asr_fallback_hints": [command_status(name) for name in ASR_HINTS],
+            "feishu_minutes_and_docs": [command_status(name) for name in LARK_HINTS],
         },
         "notes": [
             "命令存在只说明本机可执行，不能证明账号、权限、额度或模型能力可用。",
-            "ASR 完整能力需实测时间戳、置信度和 speaker diarization。",
-            "飞书输出需运行环境提供文档工具并完成登录授权。",
+            "飞书妙记主通道需实测云盘上传、妙记权限、额度、逐字稿和总结写回。",
+            "通用 ASR 仅作为备选，需实测时间戳、置信度和 speaker diarization。",
+            "豆包文档归档需运行环境提供文档工具并对原目标文件夹有编辑权限。",
         ],
     }
     required_ok = (
         result["python"]["supported"]
-        and all(item["directory_exists"] and item["skill_md_exists"] for item in skill_checks)
+        and all(
+            item["directory_exists"]
+            and item["skill_md_exists"]
+            and all(item["required_files"].values())
+            for item in skill_checks
+        )
         and source_check["valid"]
     )
     result["required_checks_passed"] = required_ok

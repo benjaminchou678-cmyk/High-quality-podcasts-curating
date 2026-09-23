@@ -74,6 +74,37 @@ def main():
         assert multi_report["metrics"]["speaker_remap"] == {"uuid-c": "1", "host": "2", "guest-z": "3", "fourth": "4"}
         assert "## 议题提要" in multi_md and "说话人4" in multi_md
 
+        english = write_episode(root, "english", {"speaker_mode": "single"}, [
+            {"start_time": 0, "end_time": 10, "speaker": "voice-a", "text": "Original English sentence.", "confidence": 0.99},
+        ])
+        (english / "transcript" / "transcript.meta.json").write_text(json.dumps({
+            "acquisition_method": "feishu_minutes",
+            "source_url": "https://example.feishu.cn/minutes/obcndemo",
+            "quality": {"audio_duration_seconds": 60},
+        }, ensure_ascii=False), encoding="utf-8")
+        module.clean_episode(english)
+        english_md = (english / "transcript" / "transcript.readable.md").read_text(encoding="utf-8")
+        assert "Original English sentence." in english_md
+        assert "Original English sentence.。" not in english_md
+        assert "飞书妙记机器转写" in english_md
+        assert "https://example.feishu.cn/minutes/obcndemo" not in english_md
+        english_meta = load(english / "transcript" / "transcript.meta.json")
+        assert english_meta["cleaning"]["minute_link_included"] is False
+
+        english_private = write_episode(root, "english-private", {"speaker_mode": "single", "include_private_links": True}, [
+            {"start_time": 0, "end_time": 10, "speaker": "voice-a", "text": "Original English sentence.", "confidence": 0.99},
+        ])
+        (english_private / "transcript" / "transcript.meta.json").write_text(json.dumps({
+            "acquisition_method": "feishu_minutes",
+            "source_url": "https://example.feishu.cn/minutes/obcndemo",
+            "quality": {"audio_duration_seconds": 60},
+        }, ensure_ascii=False), encoding="utf-8")
+        module.clean_episode(english_private)
+        private_md = (english_private / "transcript" / "transcript.readable.md").read_text(encoding="utf-8")
+        assert "https://example.feishu.cn/minutes/obcndemo" in private_md
+        private_meta = load(english_private / "transcript" / "transcript.meta.json")
+        assert private_meta["cleaning"]["minute_link_included"] is True
+
         unknown = write_episode(root, "unknown", {}, [
             {"start_time": 0, "end_time": 5, "speaker": "only-known", "text": "已有标签", "confidence": 0.99},
             {"start_time": 6, "end_time": 11, "text": "没有标签", "confidence": 0.99},

@@ -8,7 +8,7 @@ import math
 import re
 from pathlib import Path
 
-END_PUNCT = tuple("。！？…?!")
+END_PUNCT = tuple("。！？…?!.")
 
 
 def load_json(path):
@@ -56,8 +56,13 @@ def canonical_segments(raw):
             "start_time": start,
             "end_time": end,
             "speaker": str(speaker) if speaker not in (None, "") else "未确定",
-            "text": normalize_text(item.get("text", item.get("subtitle_text", ""))),
+            "text": (str(item.get("text", item.get("subtitle_text", "")) or "")
+                     if item.get("end_time_estimated")
+                     else normalize_text(item.get("text", item.get("subtitle_text", "")))),
         }
+        for key in ("end_time_estimated", "end_time_basis"):
+            if key in item:
+                record[key] = item[key]
         if isinstance(item.get("confidence"), (int, float)):
             record["confidence"] = float(item["confidence"])
         segments.append(record)
@@ -147,6 +152,8 @@ def exact_deduplicate(segments):
     for segment in segments:
         if (
             output and segment["text"] and segment["text"] == output[-1]["text"]
+            and segment["speaker"] == output[-1]["speaker"]
+            and not segment.get("end_time_estimated") and not output[-1].get("end_time_estimated")
             and segment["start_time"] - output[-1]["end_time"] <= 0.5
         ):
             removed.append(segment)
@@ -164,6 +171,7 @@ def merge_segments(segments, max_gap=3.0, max_chars=420):
         long_gap = bool(blocks and segment["start_time"] - blocks[-1]["end_time"] > 10)
         can_merge = (
             blocks and not long_gap and blocks[-1]["speaker"] == segment["speaker"]
+            and not segment.get("end_time_estimated") and not blocks[-1].get("end_time_estimated")
             and segment["start_time"] - blocks[-1]["end_time"] <= max_gap
             and len(blocks[-1]["text"]) + len(segment["text"]) <= max_chars
         )
@@ -178,10 +186,11 @@ def merge_segments(segments, max_gap=3.0, max_chars=420):
             blocks.append({
                 "start_time": segment["start_time"], "end_time": segment["end_time"],
                 "speaker": segment["speaker"], "text": segment["text"],
+                **{key: segment[key] for key in ("end_time_estimated", "end_time_basis") if key in segment},
                 "confidences": [segment["confidence"]] if "confidence" in segment else [],
             })
     for block in blocks:
-        if block["text"] and not block["text"].endswith(END_PUNCT):
+        if block["text"] and not block.get("end_time_estimated") and not block["text"].endswith(END_PUNCT):
             block["text"] += "。"
         confidences = block.pop("confidences")
         block["mean_confidence"] = sum(confidences) / len(confidences) if confidences else None
@@ -224,7 +233,8 @@ def quality(segments, expected_duration, actual_duration, automatic_chapters, up
         gap = current["start_time"] - previous["end_time"]
         if gap > 10:
             gaps.append({"start_time": previous["end_time"], "end_time": current["start_time"], "seconds": gap})
-    coverage = actual_duration / expected_duration if actual_duration and expected_duration else None
+    estimated_ends = any(segment.get("end_time_estimated") for segment in segments)
+    coverage = None if estimated_ends else (actual_duration / expected_duration if actual_duration and expected_duration else None)
     low = sum(value < 0.80 for value in confidences) / len(confidences) if confidences else None
     very_low = sum(value < 0.60 for value in confidences) / len(confidences) if confidences else None
     missing_ratio = missing_speakers / len(nonempty) if nonempty else 1.0
@@ -235,6 +245,8 @@ def quality(segments, expected_duration, actual_duration, automatic_chapters, up
         risks.append({"code": code, "severity": severity, "detail": detail})
         level_rank = max(level_rank, {"notice": 1, "review_recommended": 2, "high_risk": 3}[severity])
 
+    if estimated_ends:
+        add("end_times_estimated", "review_recommended", "妙记 TXT 仅提供开始时间；结束时间为推算边界，无法据此核验完整覆盖或长静默。")
     if automatic_chapters:
         add("automatic_chapters", "notice", "未发现可靠官方章节，使用每 15 分钟自动分段。")
     if coverage is None:
@@ -266,10 +278,11 @@ def quality(segments, expected_duration, actual_duration, automatic_chapters, up
     rare_labels = speaker_info.get("rare_raw_speaker_labels", [])
     if rare_labels:
         add("rare_speaker_cluster", "notice", f"多人模式发现 {len(rare_labels)} 个稀有声纹聚类，未自动合并，建议抽查。")
-    if len(gaps) > 3:
-        add("long_gaps", "review_recommended", f"发现 {len(gaps)} 处超过 10 秒的长静默或缺口。")
-    elif gaps:
-        add("long_gaps", "notice", f"发现 {len(gaps)} 处超过 10 秒的长静默或缺口。")
+    if not estimated_ends:
+        if len(gaps) > 3:
+            add("long_gaps", "review_recommended", f"发现 {len(gaps)} 处超过 10 秒的长静默或缺口。")
+        elif gaps:
+            add("long_gaps", "notice", f"发现 {len(gaps)} 处超过 10 秒的长静默或缺口。")
     if not nonempty:
         add("empty_transcript", "high_risk", "没有可用正文。")
     if upstream.get("status") in {"transcript_mismatch", "manual_review_required"}:
@@ -290,7 +303,9 @@ def quality(segments, expected_duration, actual_duration, automatic_chapters, up
             "speaker_segment_counts": speaker_info.get("speaker_segment_counts"),
             "speaker_remap": speaker_info.get("speaker_remap"),
             "timestamp_order_errors": order_errors,
-            "long_gap_count": len(gaps), "long_gaps": gaps,
+            "long_gap_count": None if estimated_ends else len(gaps),
+            "long_gaps": None if estimated_ends else gaps,
+            "end_times_estimated": estimated_ends,
         },
     }
 
@@ -369,13 +384,16 @@ def build_markdown(metadata, chapters, blocks, report, topic_digest=None):
     source = metadata.get("transcript_source", metadata.get("transcript_status", "未知"))
     lines = [
         f"# {md_escape(date)}｜{md_escape(podcast)}｜{md_escape(title)}", "",
-        "> ASR 机器转写，未经人工校对。",
+        "> 机器转写，未经人工校对。",
         f"> 质量状态：{risk_names[report['risk_level']]}。{md_escape(reason_text)}",
         "> 说话人编号仅表示本文内不同声纹，不代表真实身份。", "",
         f"- **节目**：{md_escape(podcast)}", f"- **发布日期**：{md_escape(date)}",
         f"- **音频时长**：{md_escape(metadata.get('duration', ''))}",
-        f"- **原节目页**：{metadata.get('episode_url', '')}", f"- **文字来源**：{md_escape(source)}", "",
+        f"- **原节目页**：{metadata.get('episode_url', '')}", f"- **文字来源**：{md_escape(source)}",
     ]
+    if metadata.get("minute_url"):
+        lines.append(f"- **飞书妙记**：{metadata['minute_url']}")
+    lines.append("")
     lines.extend(render_topic_digest(topic_digest or {"items": []}))
     lines.extend(["## 逐字稿", ""])
     chapter_index = 0
@@ -405,14 +423,18 @@ def clean_episode(episode_directory):
     upstream_path = transcript_directory / "transcript.meta.json"
     upstream = load_json(upstream_path) if upstream_path.exists() else {}
     segments = canonical_segments(load_json(segments_path))
+    estimated_ends = any(segment.get("end_time_estimated") for segment in segments)
     segments, speaker_info = resolve_speakers(segments, metadata)
     segments, removed = exact_deduplicate(segments)
     blocks = merge_segments(segments)
     shownotes_path = episode_directory / "shownotes.raw.txt"
     shownotes = shownotes_path.read_text(encoding="utf-8") if shownotes_path.exists() else ""
     expected = duration_seconds(metadata.get("duration"))
-    actual = duration_seconds(upstream.get("quality", {}).get("audio_duration_seconds"))
-    actual = actual or max((segment["end_time"] for segment in segments), default=None)
+    if estimated_ends:
+        actual = duration_seconds(upstream.get("quality", {}).get("media_duration_seconds"))
+    else:
+        actual = duration_seconds(upstream.get("quality", {}).get("audio_duration_seconds"))
+        actual = actual or max((segment["end_time"] for segment in segments), default=None)
     chapters, automatic = extract_chapters(shownotes, actual)
     topic_digest_path = transcript_directory / "topic-digest.json"
     topic_digest = validate_topic_digest(load_json(topic_digest_path) if topic_digest_path.exists() else None, actual)
@@ -420,15 +442,35 @@ def clean_episode(episode_directory):
     report["metrics"]["deduplicated_exact_count"] = len(removed)
     report["metrics"]["topic_digest_count"] = len(topic_digest["items"])
     report["episode_id"] = metadata.get("episode_id")
-    report["cleaning_version"] = "1.3.0"
+    report["cleaning_version"] = "1.4.0"
     render_metadata = dict(metadata)
-    render_metadata["transcript_source"] = "ASR" if upstream.get("acquisition_method") == "asr" else upstream.get("acquisition_method", "未知")
+    source_labels = {
+        "feishu_minutes": "飞书妙记机器转写",
+        "asr": "通用 ASR 机器转写",
+        "rss_transcript": "RSS 公开逐字稿",
+        "web_transcript": "公开节目页逐字稿",
+    }
+    acquisition_method = upstream.get("acquisition_method", "未知")
+    render_metadata["transcript_source"] = source_labels.get(acquisition_method, acquisition_method)
+    private_link = None
+    if (acquisition_method == "feishu_minutes" and metadata.get("include_private_links") is True
+            and upstream.get("source_url")):
+        from urllib.parse import urlsplit
+        link = upstream["source_url"]
+        parsed_link = urlsplit(link)
+        if (parsed_link.scheme in {"http", "https"} and parsed_link.hostname
+                and not parsed_link.username and not parsed_link.password
+                and not parsed_link.query and not parsed_link.fragment
+                and not any(c.isspace() or ord(c) < 32 for c in link)
+                and re.fullmatch(r"/minutes/[A-Za-z0-9_-]+", parsed_link.path)):
+            private_link = link
+            render_metadata["minute_url"] = link
     transcript_directory.mkdir(parents=True, exist_ok=True)
     (transcript_directory / "dialogue.readable.json").write_text(json.dumps(blocks, ensure_ascii=False, indent=2), encoding="utf-8")
     (transcript_directory / "quality-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     (transcript_directory / "transcript.readable.md").write_text(build_markdown(render_metadata, chapters, blocks, report, topic_digest), encoding="utf-8")
     upstream["cleaning"] = {
-        "version": "1.3.0",
+        "version": "1.4.0",
         "risk_level": report["risk_level"],
         "risk_codes": [risk["code"] for risk in report["risks"]],
         "speaker_mode_requested": speaker_info["speaker_mode_requested"],
@@ -438,6 +480,7 @@ def clean_episode(episode_directory):
         "topic_digest_count": len(topic_digest["items"]),
         "readable_file": "transcript.readable.md",
         "quality_file": "quality-report.json",
+        "minute_link_included": bool(private_link),
     }
     upstream_path.write_text(json.dumps(upstream, ensure_ascii=False, indent=2), encoding="utf-8")
     return {"episode_id": metadata.get("episode_id"), "risk_level": report["risk_level"], "blocks": len(blocks), "chapters": len(chapters), "topic_digest_count": len(topic_digest["items"])}

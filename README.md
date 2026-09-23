@@ -4,7 +4,7 @@
 
 仓库包含两部分能力：
 
-1. `podcast-weekly-collector`：按自然周读取 23 个公开 RSS，定位新单集，并按“RSS 逐字稿 → 公开节目页 → 公开音频 ASR”顺序取得逐字稿。
+1. `podcast-weekly-collector`：按自然周读取 23 个公开 RSS，定位新单集，并按“RSS 逐字稿 → 公开节目页 → 飞书妙记 → 通用 ASR 备选”顺序取得逐字稿。
 2. `podcast-transcript-cleaner`：保留原始证据，执行确定性轻编辑；单人节目统一为 `说话人1`，多人节目按稳定声纹连续编号且不限制人数；在完整逐字稿前生成最多两层、带时间证据的议题提要，并输出质量风险标记、Markdown、JSON 与 HTML 阅读版。
 
 ## 已包含的真实案例
@@ -55,7 +55,7 @@
 ## 分享与安装
 
 - 需要独立运行：按 [`docs/installation.md`](docs/installation.md) 安装两个 Skill。
-- ASR 与飞书并非 Skill 自动附带的能力，详细边界和接入契约见 [`docs/asr-and-integrations.md`](docs/asr-and-integrations.md)。
+- 飞书妙记、通用 ASR 与飞书文档能力均不随 Skill 自动附带，详细边界、默认流程和备选契约见 [`docs/asr-and-integrations.md`](docs/asr-and-integrations.md)。
 
 安装前可以运行只读环境检查：
 
@@ -96,8 +96,14 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --dry-run --overwr
 │   ├── podcast-weekly-collector/
 │   │   ├── SKILL.md
 │   │   ├── assets/default-sources.json
-│   │   ├── references/input-schema.md
-│   │   └── scripts/fetch_week.py
+│   │   ├── references/
+│   │   │   ├── input-schema.md
+│   │   │   ├── feishu-minutes-workflow.md
+│   │   │   └── asr-contract.md
+│   │   └── scripts/
+│   │       ├── fetch_week.py
+│   │       ├── import_minutes_transcript.py
+│   │       └── render_minutes_summary.py
 │   └── podcast-transcript-cleaner/
 │       ├── SKILL.md
 │       ├── references/
@@ -159,7 +165,7 @@ python3 skills/podcast-weekly-collector/scripts/fetch_week.py \
   --output ./output
 ```
 
-采集脚本负责公开 RSS 下载、日期筛选、字段提取和目录生成。ASR 是可替换外部通道，需要运行环境提供能够返回时间戳、置信度和 speaker 字段的服务。
+采集脚本负责公开 RSS 下载、日期筛选、字段提取和目录生成。没有公开全文时，默认将公开音频上传原播客文件夹并创建飞书妙记；妙记完成后，使用 `import_minutes_transcript.py` 将导出的说话人和时间戳接回现有清洗流程。通用 ASR 只在妙记不可用或失败时启用。音频和最终豆包逐字稿、周报沿用原共享目录；妙记本身的父目录和权限不从音频继承关系推断。实际 token 只保存在私有运行配置，不写入仓库。仅 Markdown 输出默认不创建飞书资源。
 
 ## 清洗单集
 
@@ -175,11 +181,12 @@ python3 skills/podcast-transcript-cleaner/scripts/clean_transcript.py <episode-d
 
 ```bash
 python3 tests/test_clean_transcript.py
+python3 tests/test_import_minutes_transcript.py
 ```
 
 ## 数据与使用边界
 
-- 逐字稿均由 ASR 生成，未经人工校对，不应作为原节目官方文稿。
+- 机器逐字稿可能来自飞书妙记或通用 ASR，均未经人工逐句校对，不应作为原节目官方文稿。
 - 说话人编号只代表单篇文稿中的不同声纹，不推断真实身份。
 - 质量风险只标记，不阻止文档生成；使用前请结合原节目复核。
 - 本仓库不分发音频文件；音频和节目内容的权利归原权利人所有。

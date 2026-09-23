@@ -93,7 +93,7 @@ python3 scripts/check_environment.py
 - 两个 Skill 是否完整；
 - 23 个 RSS 配置是否可解析；
 - 可选的 Git、GitHub CLI；
-- 可选 ASR / 飞书通道提示。
+- 飞书妙记主通道、通用 ASR 备选与飞书归档能力提示。
 
 该脚本只做本地只读检查，不联网、不登录，也不会验证真实服务权限。
 
@@ -104,12 +104,15 @@ python3 scripts/check_environment.py
 | 读取公开 RSS | 是 | 网络可以访问 RSS |
 | 筛选某个自然周单集 | 是 | Python 3.10+ |
 | 使用 RSS 已提供的逐字稿 | 是 | 来源确实提供逐字稿 |
-| 从音频生成逐字稿 | 否 | ASR 工具/API/平台能力 |
-| 时间戳 | 不一定 | ASR 必须返回起止时间 |
-| 置信度 | 不一定 | ASR 必须返回 confidence |
-| 说话人分区 | 不一定 | ASR 必须支持 diarization/speaker info |
+| 使用飞书妙记从音频生成逐字稿（默认） | 否 | `lark-drive`、`lark-meeting`、登录、云盘/妙记权限与额度 |
+| 使用通用 ASR 从音频生成逐字稿（备选） | 否 | ASR 工具/API/平台能力 |
+| 时间戳 | 不一定 | 妙记通常提供；备选 ASR 必须返回起止时间 |
+| 置信度 | 不一定 | 妙记通常不提供；备选 ASR 可选返回 confidence |
+| 说话人分区 | 不一定 | 妙记或备选 ASR 必须支持 diarization/speaker info |
 | 输出 Markdown | 是 | 本地文件写入能力 |
 | 输出飞书文档 | 否 | 飞书文档工具、登录和目标目录权限 |
+
+仅输出 Markdown 时不会创建或修改飞书资源；若仍希望用妙记作为中间转写，需要另行明确授权。飞书妙记与豆包文档是不同资源，音频上传到节目文件夹不代表妙记自动继承目录或共享权限。
 
 ## 七、升级
 
@@ -121,22 +124,23 @@ python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --dry-run --overwr
 python3 scripts/install_skills.py --target "$USER_SKILLS_DIR" --overwrite
 ```
 
-升级前建议备份同事在 Skill 目录中的自定义修改。
+升级脚本会先把旧目录完整备份到 `.skill-backups/时间戳/`，再安装仓库版本；不会把旧目录中的本地自定义自动合并进新版本。升级后按需从备份手动合并，并重新运行测试与环境检查。
 
 ## 八、常见问题
 
-### Skill 能看到，但不能转写音频
+### Skill 能看到，但不能使用飞书妙记转写音频
 
-这是最常见情况：Skill 已安装，但运行环境没有 ASR 通道。可以：
+先确认环境已安装并可调用 `lark-drive`、`lark-meeting`，当前用户已登录，对原共享文件夹有编辑权限，且妙记仍有可用额度。妙记不可用时，Skill 才会改用通用 ASR 备选；如果两类通道都不可用，则只能处理 RSS 或节目页已有的公开逐字稿。
 
-- 使用 RSS 或节目页已有逐字稿；
-- 接入平台自带音频转写工具；
-- 接入公开云 ASR API；
-- 本地运行 Whisper 类模型后，把结果转换为规定的 `segments.raw.json`。
+可选的通用 ASR 方案包括：
+
+- Agent 平台自带音频转写工具；
+- 公开云 ASR API；
+- 本地 Whisper 类模型，输出需转换为规定的 `segments.raw.json`。
 
 ### 能转文字，但没有说话人标签
 
-普通语音识别与说话人分区是两项能力。需要 ASR 支持 `speaker diarization`，或增加独立的说话人分区步骤。缺少 speaker 时 Skill 会保留正文并标记复核风险。
+普通语音识别与说话人分区是两项能力。妙记通常会提供声纹分区；若妙记或备选 ASR 没有 speaker，Skill 会保留正文并标记复核风险，不猜测身份。
 
 ### 不能写飞书
 

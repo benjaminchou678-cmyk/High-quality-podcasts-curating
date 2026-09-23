@@ -15,6 +15,10 @@ venv/
 *.pem
 *.key
 credentials*.json
+runtime.private.json
+*.private.json
+minutes.transcript.raw.txt
+minutes/
 
 # Private media / raw processing data
 *.mp3

@@ -1,6 +1,6 @@
 ---
 name: podcast-weekly-collector
-description: 按指定自然周从公开 RSS 采集播客单集元信息，并按 RSS 逐字稿、公开节目页、公开音频 ASR 的优先级取得逐字稿；进入逐字稿生成前主动询问用户选择输出为飞书文档、Markdown 文件或两者。用于播客周采集、单集发现、逐字稿来源定位和 ASR 前置准备；不绕过登录、付费墙、robots 限制或访问控制。
+description: 按指定自然周从公开 RSS 采集播客单集元信息，并按 RSS 逐字稿、公开节目页、飞书妙记、通用 ASR 备选的优先级取得逐字稿；进入逐字稿生成前主动询问用户选择输出为飞书文档、Markdown 文件或两者。用于播客周采集、单集发现、妙记转写、逐字稿来源定位和 ASR 备选准备；不绕过登录、付费墙、robots 限制或访问控制。
 ---
 
 # 播客周采集
@@ -27,13 +27,14 @@ RSS 元数据和来源状态可以先采集，但在开始取得/清洗逐字稿
 
 示例配置见 [`references/input-schema.md`](references/input-schema.md)。
 
-## 采集顺序
+## 采集与转写顺序
 
 对每个区间内单集依次执行：
 
 1. **RSS 显式逐字稿**：识别 Podcasting 2.0 `podcast:transcript` 等公开字段，记录 URL、MIME 类型和语言。
 2. **公开节目页**：只读取无需登录即可访问的可见内容，查找全文逐字稿或明确指向逐字稿的链接；简介和 Shownotes 不能冒充逐字稿。
-3. **公开音频 ASR**：前两步均无全文时，使用 RSS enclosure 中的公开音频。ASR 通道应返回起止时间、正文、置信度，并尽可能返回 speaker。
+3. **飞书妙记主通道**：前两步均无全文时，使用 RSS enclosure 中的公开音频。先读取运行环境中的 `lark-drive` 与 `lark-meeting` Skill，再完整执行 [`飞书妙记工作流`](references/feishu-minutes-workflow.md)：下载音频、上传到原播客文件夹、创建一次妙记、等待转写、导入证据层、生成中文议题提要并写回妙记总结区。妙记只承担转写、说话人、时间戳和回听；原豆包逐字稿及周报仍归档到用户原先指定的“按播客/按周”文件夹。
+4. **通用 ASR 备选通道**：仅当妙记不可用、超出限制、额度不足或明确失败时，才按 [`ASR 接入契约`](references/asr-contract.md) 调用原 ASR。不得同时启动妙记与 ASR，也不得因妙记失败把 Shownotes 当全文。
 
 不得绕过登录、付费墙、验证码、robots 限制或站点访问控制。页面无法公开访问时，记录原因并进入下一合法通道。
 
@@ -49,11 +50,33 @@ python3 <skill-dir>/scripts/fetch_week.py \
 
 脚本只负责公开 RSS 下载、日期筛选、字段提取和目录生成，不调用私有 ASR 服务。
 
-## ASR 输出契约
+## 飞书妙记主通道与 ASR 备选
 
-ASR 是运行环境提供的音频转写工具、模型或 API，不随 Skill 自动安装。普通 Agent 是否具备该能力取决于平台工具、账号权限和额度；“能接收音频”不等于能够稳定返回时间戳、置信度或说话人分区。首次使用前完整读取 [`references/asr-contract.md`](references/asr-contract.md) 并用短音频实测。
+飞书妙记是没有公开全文时的默认音频转写通道。完整执行步骤、格式与大小限制、幂等、失败恢复、临时文件清理和原文件夹归档要求见 [`飞书妙记工作流`](references/feishu-minutes-workflow.md)。
 
-外部 ASR 结果规范化为：
+妙记导出的逐字稿通过以下确定性脚本接回证据层：
+
+```bash
+python3 <skill-dir>/scripts/import_minutes_transcript.py \
+  <transcript.txt> \
+  <episode-dir> \
+  --minute-url <minute_url> \
+  --audio-file-url <audio_file_url>
+```
+
+脚本生成 `minutes.transcript.raw.txt`、`segments.raw.json` 和 `transcript.meta.json`，并将 `acquisition_method` 记录为 `feishu_minutes`。妙记一般提供时间戳和说话人，但不保证片段置信度；缺少置信度时按清洗 Skill 规则标记风险。
+
+仅 Markdown 输出默认不使用会创建云端资源的妙记，除非用户单独授权。其他情况下妙记为默认音频转写通道，详见工作流。渲染总结时使用：
+
+```bash
+python3 <skill-dir>/scripts/render_minutes_summary.py \
+  <episode-dir>/transcript/topic-digest.json \
+  --output <episode-dir>/transcript/minutes-summary.md
+```
+
+与豆包文档共用一份中文提要；正文保持原语言。导入脚本拒绝覆盖原始证据，TXT 结束时间仅为推算边界，质量报告必须标记。归档目标来自私有 `archive_context`，不要猜文件夹或写到根目录。只取得正文但总结写回失败时继续归档，不重做 ASR。
+
+通用 ASR 是运行环境提供的音频转写工具、模型或 API，不随 Skill 自动安装。仅在妙记通道不可用或失败时启用；首次使用前完整读取 [`ASR 接入契约`](references/asr-contract.md) 并用短音频实测。外部 ASR 结果规范化为：
 
 ```json
 [
@@ -75,13 +98,20 @@ ASR 是运行环境提供的音频转写工具、模型或 API，不随 Skill �
 
 - `metadata.json`：节目、标题、日期、节目页、音频 URL、时长和逐字稿候选。
 - `shownotes.raw.txt`：RSS 原始简介，仅作章节与身份核对证据。
-- `transcript/segments.raw.json`：ASR 或公开逐字稿的原始结构化结果。
-- `transcript/transcript.meta.json`：取得通道、时间、来源 URL、状态和质量字段。
+- `transcript/segments.raw.json`：飞书妙记、通用 ASR 或公开逐字稿的原始结构化结果。
+- `transcript/minutes.transcript.raw.txt`：使用妙记时保存的原始导出文本；不得覆盖。
+- `transcript/transcript.meta.json`：取得通道、时间、来源 URL、妙记/音频链接、状态和质量字段。
 
 推荐状态：
 
 - `rss_transcript_found`
 - `web_transcript_found`
+- `minutes_audio_uploaded`
+- `minutes_creation_submitted`
+- `minutes_processing`
+- `minutes_transcript_generated`
+- `minutes_summary_updated`
+- `minutes_failed_asr_fallback`
 - `asr_required`
 - `asr_transcript_generated`
 - `manual_review_required`

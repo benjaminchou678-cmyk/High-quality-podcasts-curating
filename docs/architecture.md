@@ -6,9 +6,9 @@
 单集 metadata + shownotes
   ↓ 输出选择门：飞书文档 / Markdown / 两者
   ↓ 逐字稿来源优先级
-RSS transcript → 公开节目页 → 公开音频 ASR
+RSS transcript → 公开节目页 → 飞书妙记 → 通用 ASR 备选
   ↓ 原始证据层（不覆盖）
-segments.raw.json + transcript.meta.json
+minutes.transcript.raw.txt（妙记时）+ segments.raw.json + transcript.meta.json
   ↓ 确定性清洗
 合并同 speaker / 完全重复去除 / 标点规范 / 章节插入
   ↓
@@ -21,7 +21,7 @@ weekly-report.md + weekly-report.html
 
 ### 1. 证据与阅读分层
 
-原始分段是可追溯证据，清洗结果另存为新文件。任何修订都不回写原始 ASR。
+原始分段是可追溯证据，清洗结果另存为新文件。任何修订都不回写飞书妙记原始导出或通用 ASR 原始结果。妙记作为默认音频转写与回听入口，原豆包逐字稿及周报仍写入用户既有的按播客/按周文件夹。
 
 ### 2. 半开时间区间
 

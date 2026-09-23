@@ -47,5 +47,7 @@
 - `duration`
 - `rss_transcript_candidates`
 - `transcript_status`
+- 运行期可增加 `transcription_channel`：`feishu_minutes` 或 `asr`；默认优先 `feishu_minutes`。
+- 运行期可增加 `minute_url`、`audio_file_url` 和最终豆包文档 URL；这些字段仅保存在私有工作清单，不进入公开示例或 GitHub。
 
-任何运行环境特有的文档 token、绝对路径或认证信息都不应写入公开 manifest。
+任何运行环境特有的文件夹/文档 token、妙记 token、绝对路径或认证信息都不应写入公开 manifest。

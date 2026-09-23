@@ -39,7 +39,8 @@ description: 清洗、整理和规范播客或访谈逐字稿，在保留原始 
 同一单集目录中读取：
 
 - `metadata.json`：标题、节目、发布日期、节目页和音频时长。
-- `transcript/segments.raw.json`：起止时间、speaker、文本和可选置信度；不得覆盖。
+- `transcript/segments.raw.json`：起止时间、speaker、文本和可选置信度；可来自飞书妙记、通用 ASR 或公开逐字稿，不得覆盖。
+- `transcript/minutes.transcript.raw.txt`：使用飞书妙记时保存的原始导出文本；缺失时表示使用其他取得通道。
 - `transcript/transcript.meta.json`：来源、ASR 时长与上游状态。
 - `shownotes.raw.txt`：只提取明确章节时间点，不拼入正文。
 
@@ -53,12 +54,14 @@ description: 清洗、整理和规范播客或访谈逐字稿，在保留原始 
 2. **阅读层**：`topic-digest.json`（议题提要结构）、`transcript.readable.md` 和周报 HTML。
 3. **结构层**：`dialogue.readable.json`、`quality-report.json`。
 
-议题提要是完整逐字稿前的快速阅读层，不替代逐字稿，也不改变逐字稿时间顺序。正式生成前读取 [`references/topic-digest.md`](references/topic-digest.md)。
+议题提要置于元信息与完整逐字稿之间，不替代正文。正式生成前读取 [`references/topic-digest.md`](references/topic-digest.md)。使用妙记时，同一提要渲染到妙记总结区；豆包文档及周报仍在原按播客/按周文件夹中原地更新。仅 Markdown 输出不创建或修改飞书资源。私有文档回听链接需显式 `include_private_links: true`，公开 Markdown 默认不包含妙记链接。
+
+妙记 TXT 的结束时间通常为推算边界，保留 `end_time_estimated`/`end_time_basis`，不利用该边界合并或去重。覆盖率和长静默指标不能据此精确计算，置为 `null` 并标记风险。
 
 ## 工作流
 
 1. 执行“输出选择门”，确认 `lark_doc`、`markdown` 或两者；未选择时先询问。
-2. 校验时间戳、空文本、时长覆盖、speaker 分布、长静默和置信度。
+2. 完整读取 `transcript.meta.json` 并识别取得通道：`feishu_minutes` 为默认音频转写来源，`asr` 为备选；两者都必须校验时间戳、空文本、时长覆盖、speaker 分布、长静默和置信度。妙记通常没有片段置信度，按风险规则标记 `confidence_unavailable`，不得伪造数值。
 3. 先判定 `single` / `multi` / `auto` 说话人模式：单人节目统一显示为 `说话人1`；多人节目按原始稳定声纹首次出现顺序连续编号为 `说话人1`、`说话人2`、`说话人3`……，人数不设上限；缺失标签保留未确定，不推断身份。正式处理前读取 [`references/speaker-modes.md`](references/speaker-modes.md)。
 4. 合并连续同说话人碎片：默认间隔不超过 3 秒，合并后不超过 420 字。
 5. 仅规范空白、标点、完全相邻重复和对话块句末标点，不重写措辞。
@@ -109,7 +112,7 @@ python3 <skill-dir>/scripts/clean_transcript.py <episode-dir>
 ```markdown
 # YYYY-MM-DD｜播客名｜单集标题
 
-> ASR 机器转写，未经人工校对。
+> 机器转写，未经人工校对。
 > 质量状态：注意。使用自动分段。
 > 说话人编号仅表示本文内不同声纹，不代表真实身份。
 
